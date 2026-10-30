@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0b">
+<meta name="description" content="Client Rescue AI — ξεκάθαρη και εύχρηστη διαχείριση αιτημάτων ξενοδοχείου.">
+<title>Client Rescue AI | Hotel Revenue Desk</title>
+<style>
+:root {
+  --bg:#0b0c0b; --panel:#131513; --panel2:#191b18;
+  --line:#292b26; --gold:#d8b574; --gold2:#f0d7a2;
+  --text:#f4f1e9; --muted:#a4a69d; --green:#9bd5ad;
+  --red:#e9a5a0; --radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:14px/1.5 Inter,system-ui,-apple-system,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);padding:25px 17px;background:#0e0f0e}
+.brand{display:flex;align-items:center;gap:11px;margin:0 0 36px}
+.logo{width:39px;height:39px;border:1px solid #796542;border-radius:13px;
+display:grid;place-items:center;color:var(--gold);font-weight:800;font-size:19px}
+.brand strong{display:block;letter-spacing:.08em;font-size:12px}
+.brand small{color:var(--muted);font-size:10px;letter-spacing:.13em}
+.nav-label{color:#74776e;font-size:10px;letter-spacing:.15em;margin:22px 10px 8px}
+.nav{display:flex;gap:11px;align-items:center;padding:11px 12px;border-radius:11px;
+color:#b9bbb2;margin:4px 0;cursor:pointer}
+.nav.active,.nav:hover{background:#22231e;color:var(--gold2)}
+.nav .ico{width:19px;text-align:center}
+.sidebar-note{margin-top:35px;padding:14px;border:1px solid var(--line);
+border-radius:14px;color:var(--muted);font-size:12px}
+.sidebar-note b{display:block;color:var(--gold);margin-bottom:5px}
+.main{min-width:0;padding:25px clamp(15px,3vw,38px) 45px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;
+border-bottom:1px solid var(--line);padding-bottom:21px;margin-bottom:27px}
+.eyebrow{color:var(--gold);font-size:10px;letter-spacing:.17em;text-transform:uppercase}
+h1{font-size:clamp(24px,3vw,34px);line-height:1.15;letter-spacing:-.04em;margin:6px 0}
+.subtitle{color:var(--muted);margin:7px 0 0;font-size:13px}
+.top-actions{display:flex;align-items:center;gap:9px}
+.pill{border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:var(--muted);
+font-size:11px;white-space:nowrap}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);
+border-radius:11px;padding:10px 13px;font-weight:600;font-size:12px}
+.btn:hover{border-color:#8d754a}
+.btn.gold{background:var(--gold);color:#18150f;border-color:var(--gold)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:23px}
+.stat,.panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.stat{padding:17px}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.stat-icon{color:var(--gold);font-size:17px}
+.stat-number{font-size:clamp(24px,3vw,33px);font-weight:650;letter-spacing:-.04em;margin:13px 0 4px}
+.stat-foot{font-size:11px;color:var(--muted)}
+.gold-text{color:var(--gold)}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,.85fr);gap:17px}
+.panel{padding:19px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.panel h2{font-size:15px;margin:0;letter-spacing:-.02em}
+.panel p.desc{font-size:12px;color:var(--muted);margin:5px 0 0}
+.toolbar{display:flex;gap:8px;margin-bottom:13px}
+.field{width:100%;min-width:0;background:#0d0e0d;border:1px solid var(--line);
+border-radius:10px;padding:10px 11px;color:var(--text);outline:none}
+.field:focus{border-color:#9e8556}
+select.field{width:auto}
+.lead-list{display:flex;flex-direction:column;gap:9px}
+.lead{padding:13px;border:1px solid var(--line);border-radius:13px;background:#101210}
+.lead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.lead-name{font-weight:650;font-size:13px}
+.lead-email{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.lead-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.tag{display:inline-block;padding:4px 8px;border-radius:7px;background:#25261f;color:#d5d1c4;font-size:10px}
+.tag.open{color:var(--gold2);background:#322a1b}
+.tag.confirmed{color:var(--green);background:#18281d}
+.tag.lost{color:var(--red);background:#2b1d1c}
+.lead-actions{display:flex;flex-wrap:wrap;gap:6px}
+.lead-actions .btn{padding:7px 9px;font-size:11px}
+.lead-actions .btn.edit-action{border-color:#8d754a;color:var(--gold2);background:#252117}
+.lead-actions .btn.edit-action:hover{background:#332b1d;border-color:var(--gold)}
+.money{font-weight:650;color:var(--gold2);white-space:nowrap}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.side-stack{display:flex;flex-direction:column;gap:17px}
+.rescue-box{background:linear-gradient(145deg,#252219,#151613);border-color:#57482e}
+.rescue-box .big{font-size:24px;color:var(--gold2);font-weight:650;margin:12px 0 4px}
+.rescue-box .desc{color:#c0b9a8}
+.rescue-box .btn{margin-top:13px}
+.steps{display:flex;flex-direction:column;gap:13px}
+.step{display:flex;gap:10px;align-items:flex-start}
+.step-n{width:26px;height:26px;border:1px solid #665538;color:var(--gold);
+border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:11px}
+.step b{display:block;font-size:12px;margin-bottom:2px}
+.step span{display:block;color:var(--muted);font-size:11px}
+.section{display:none}
+.section.active{display:block}
+.notice{margin:0 0 20px;padding:13px 15px;border:1px solid #4e432d;background:#211d15;border-radius:12px;
+padding:12px 14px;color:#d5c9ae;font-size:12px;margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;color:var(--muted)}
+.form-group.full{grid-column:1/-1}
+textarea.field{min-height:90px;resize:vertical}
+.modal-back{position:fixed;inset:0;background:#000b;display:none;align-items:center;
+justify-content:center;padding:16px;z-index:10}
+.modal-back.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+padding:21px;width:min(520px,100%);max-height:90vh;overflow:auto}
+.modal h2{font-size:19px;margin:0 0 5px}
+.modal .subtitle{margin-bottom:18px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+.email-output{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c0d0c;
+border:1px solid var(--line);padding:15px;border-radius:12px;min-height:170px;
+font-size:12px;color:#e9e5dc}
+.footer{color:#6f726a;font-size:10px;text-align:center;margin-top:25px}
+.mobile-menu{display:none}
+@media(max-width:950px){
+ .app{grid-template-columns:1fr}
+ .sidebar{position:sticky;top:0;z-index:5;border-right:0;border-bottom:1px solid var(--line);
+ padding:10px 13px;display:flex;align-items:center;gap:12px;overflow-x:auto}
+ .brand{margin:0 12px 0 0;flex-shrink:0}.brand small{display:none}
+ .brand .logo{width:34px;height:34px}
+ .nav-label,.sidebar-note{display:none}
+ .nav{padding:9px 11px;margin:0;white-space:nowrap;font-size:12px}
+ .main{padding-top:19px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .layout{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+ .topbar{align-items:flex-start}
+ .top-actions{flex-direction:column;align-items:flex-end}
+ .pill{display:none}
+ .panel{padding:14px}
+ .stat{padding:13px}
+ .stat-top{font-size:11px}
+ .toolbar{flex-direction:column}
+ .toolbar select.field{width:100%}
+ .form-grid{grid-template-columns:1fr}
+ .form-group.full{grid-column:auto}
+}
+
+/* Πρόσθετη premium και φιλική εμπειρία — διατηρεί την αρχική dark/gold παλέτα και τα 4 στατιστικά πλαίσια */
+.welcome-panel {
+  display:grid; grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
+  gap:24px; align-items:center; margin:0 0 22px; padding:clamp(20px,3vw,30px);
+  border:1px solid #57482e; border-radius:20px;
+  background:linear-gradient(135deg,#201e18 0%,#131513 100%);
+  box-shadow:0 10px 30px #0003;
+}
+.welcome-copy h2 { margin:5px 0 10px; color:var(--gold2); font-size:clamp(25px,2.5vw,32px); line-height:1.2; }
+.welcome-copy p { max-width:60ch; margin:0; color:#d1cec4; font-size:18px; line-height:1.65; }
+.welcome-actions { display:grid; gap:12px; }
+.primary-task { width:100%; min-height:58px; text-align:left; padding:16px 18px; font-size:16px; }
+.quick-help { margin:0 0 22px; padding:23px; border:1px solid #57482e; border-radius:18px; background:#151713; box-shadow:0 8px 25px #0003; }
+.quick-help[hidden] { display:none !important; }
+.quick-help-head { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:10px; }
+.quick-help h2 { margin:4px 0; color:var(--gold2); font-size:23px; }
+.help-steps { display:grid; gap:14px; margin:16px 0; padding-left:28px; }
+.help-steps li { padding-left:4px; color:var(--text); font-size:17px; }
+.help-steps li strong,.help-steps li span { display:block; }
+.help-steps li span { margin-top:4px; color:#c5c5bc; font-size:15px; line-height:1.65; }
+.help-note { margin:0; padding:13px 15px; border:1px solid #57482e; border-radius:11px; background:#211d15; color:#e4d5b7; font-size:15px; line-height:1.6; }
+#help-toggle[aria-expanded="true"] { border-color:var(--gold); color:var(--gold2); }
+.btn { min-height:42px; font-size:14px; }
+.field { min-height:46px; font-size:16px; }
+.form-group label { font-size:14px; line-height:1.5; }
+.nav { min-height:46px; font-size:14px; }
+.nav.active { box-shadow:inset 3px 0 var(--gold); }
+.lead-name { font-size:15px; }
+.lead-email { font-size:13px; }
+.tag { font-size:12px; }
+.lead-actions .btn { min-height:40px; font-size:13px; padding:9px 11px; }
+.lead-actions .btn.edit-action { font-weight:750; }
+.btn:focus-visible, .field:focus-visible, .nav:focus-visible {
+  outline:3px solid var(--gold2); outline-offset:3px;
+}
+.btn:active { transform:translateY(1px); }
+@media (max-width:760px) {
+  .welcome-panel { grid-template-columns:1fr; gap:18px; padding:19px; }
+  .welcome-copy p { font-size:17px; }
+  .quick-help { padding:17px; }
+  .quick-help-head { align-items:flex-start; flex-direction:column; }
+  .topbar { flex-wrap:wrap; }
+  .top-actions { flex-wrap:wrap; align-items:flex-start; }
+  .top-actions .btn { min-height:44px; }
+}
+@media (min-width:501px) {
+  body.large-text { font-size:18px; }
+  body.large-text .subtitle, body.large-text .panel p.desc, body.large-text .stat-top,
+  body.large-text .stat-foot, body.large-text .form-group label, body.large-text .lead-email { font-size:16px; }
+  body.large-text .btn, body.large-text .nav, body.large-text .lead-name { font-size:17px; }
+  body.large-text .field { font-size:18px; min-height:52px; }
+  body.large-text .welcome-copy p, body.large-text .help-steps li { font-size:20px; }
+  body.large-text .help-steps li span, body.large-text .help-note { font-size:18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+}
+
+
+.auth-gate{position:fixed;inset:0;z-index:1000;background:rgba(5,6,5,.96);display:grid;place-items:center;padding:20px}
+.auth-card{width:min(440px,100%);background:#131513;border:1px solid #57482e;border-radius:20px;padding:26px;box-shadow:0 25px 80px #0009}
+.auth-card h2{margin:0 0 8px;color:var(--gold2)}.auth-card p{color:var(--muted);font-size:13px}
+.auth-card label{display:block;margin:13px 0 6px;color:#d5d1c4;font-size:12px}
+.auth-card .field{margin-bottom:4px}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.auth-message{min-height:20px;color:var(--gold2);font-size:12px;margin-top:12px}
+#cloud-user{max-width:180px;overflow:hidden;text-overflow:ellipsis}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">CR</div><div><strong>CLIENT RESCUE</strong><small>HOTEL REVENUE DESK</small></div></div>
+  <div class="nav active" data-page="dashboard" role="button" tabindex="0" aria-current="page"><span class="ico">◫</span> Αρχική εικόνα</div>
+  <div class="nav" data-page="leads" role="button" tabindex="0"><span class="ico">◎</span> Αιτήματα κρατήσεων</div>
+  <div class="nav" data-page="email" role="button" tabindex="0"><span class="ico">✉</span> Βοηθός email</div>
+  <div class="nav" data-page="reports" role="button" tabindex="0"><span class="ico">↗</span> Αναφορές & δεδομένα</div>
+</aside>
+<main class="main">
+<header class="topbar">
+ <div><div class="eyebrow">Hospitality · Revenue operations</div><h1 id="page-title">Επισκόπηση εσόδων</h1>
+ <p class="subtitle" id="page-subtitle">Μια καθαρή εικόνα των αιτημάτων κρατήσεων.</p></div>
+ <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
+</header>
+
+
+ <div id="storage-warning" class="notice" role="status" hidden>Δεν υπάρχει σύνδεση με την online βάση. Οι αλλαγές δεν έχουν αποθηκευτεί.</div>
+ <section class="welcome-panel" aria-labelledby="welcome-title">
+  <div class="welcome-copy"><div class="eyebrow">ΚΑΛΩΣ ΗΡΘΕΣ ΣΤΟ WORKSPACE</div><h2 id="welcome-title">Οργάνωσε κάθε αίτημα. Μην αφήνεις ευκαιρίες να χάνονται.</h2><p>Καταχώρισε τα αιτήματα κρατήσεων, ετοίμασε προσεγμένες απαντήσεις και παρακολούθησε την κατάστασή τους από ένα σημείο.</p></div>
+  <div class="welcome-actions"><button class="btn gold primary-task" id="welcome-new-lead" type="button">＋ Καταχώριση νέου αιτήματος</button><button class="btn primary-task" id="welcome-open-leads" type="button">◎ Προβολή όλων των αιτημάτων</button></div>
+ </section>
+ <section class="quick-help" id="quick-help" tabindex="-1" aria-labelledby="help-title" hidden>
+  <div class="quick-help-head"><div><div class="eyebrow">ΓΡΗΓΟΡΗ ΕΚΚΙΝΗΣΗ</div><h2 id="help-title">Πώς να χρησιμοποιήσεις το Client Rescue</h2></div><button class="btn" id="help-close" type="button">Κλείσιμο βοήθειας</button></div>
+  <ol class="help-steps"><li><strong>Καταχώρισε το αίτημα</strong><span>Συμπλήρωσε όνομα, email, ημερομηνία, άτομα και εκτιμώμενη αξία.</span></li><li><strong>Έλεγξε και ετοίμασε την απάντηση</strong><span>Διάλεξε το αίτημα στον Βοηθό email και έλεγξε κάθε πληροφορία πριν τη χρησιμοποιήσεις.</span></li><li><strong>Ενημέρωσε την κατάστασή του</strong><span>Στα αιτήματα, άλλαξε κατάσταση και χρησιμοποίησε τα φίλτρα για να βρεις ό,τι χρειάζεται ενέργεια.</span></li><li><strong>Κράτησε αντίγραφο</strong><span>Από τις αναφορές μπορείς να εξαγάγεις τα δεδομένα σε CSV ή JSON.</span></li></ol>
+  <p class="help-note">Σημαντικό: αυτή είναι τοπική demo εφαρμογή. Δεν συνδέεται με πραγματικό inbox ή σύστημα κρατήσεων και τα προσχέδια email πρέπει να ελέγχονται πριν από την αποστολή.</p>
+ </section>
+
+<section class="section active" id="page-dashboard">
+ <div class="notice">CLOUD WORKSPACE · Τα αιτήματα αποθηκεύονται στον προσωπικό σου λογαριασμό Supabase. Δεν συνδέεται ακόμη με πραγματικό inbox ή PMS.</div>
+ <div class="stats">
+  <div class="stat"><div class="stat-top">Σύνολο αιτημάτων <span class="stat-icon">◎</span></div><div class="stat-number" id="stat-total">0</div><div class="stat-foot">Καταχωρισμένα αιτήματα</div></div>
+  <div class="stat"><div class="stat-top">Εκκρεμή <span class="stat-icon">◷</span></div><div class="stat-number" id="stat-open">0</div><div class="stat-foot">Χρειάζονται ενέργεια</div></div>
+  <div class="stat"><div class="stat-top">Επιβεβαιωμένα <span class="stat-icon">✓</span></div><div class="stat-number" id="stat-confirmed">0</div><div class="stat-foot">Έχουν επιβεβαιωθεί</div></div>
+  <div class="stat"><div class="stat-top">Δυνητική αξία <span class="stat-icon">€</span></div><div class="stat-number" id="stat-value">€0</div><div class="stat-foot">Αξία αιτημάτων, όχι κέρδος</div></div>
+ </div>
+ <div class="layout">
+  <div class="panel">
+   <div class="panel-head"><div><h2>Πρόσφατα αιτήματα</h2><p class="desc">Ενέργειες που μπορείτε να κάνετε τώρα</p></div><button class="btn ghost" data-goto="leads">Όλα →</button></div>
+   <div class="lead-list" id="recent-list"></div>
+  </div>
+  <div class="side-stack">
+   <div class="panel rescue-box"><div class="eyebrow">ΕΥΚΑΙΡΙΕΣ ΕΞΥΠΗΡΕΤΗΣΗΣ</div><h2>Μην αφήνεις ένα αίτημα αναπάντητο.</h2><div class="big" id="rescue-count">0 ανοιχτά</div><p class="desc">Ετοίμασε μια επαγγελματική απάντηση και συνέχισε τη διαδικασία από το email σου.</p><button class="btn gold" data-goto="leads">Προβολή αιτημάτων →</button></div>
+   <div class="panel"><div class="panel-head"><div><h2>Προτεινόμενη ροή</h2><p class="desc">Απλό workflow για μικρά ξενοδοχεία</p></div></div>
+    <div class="steps">
+     <div class="step"><div class="step-n">01</div><div><b>Καταχώρισε το αίτημα</b><span>Πέρασε τα στοιχεία που έλαβες.</span></div></div>
+     <div class="step"><div class="step-n">02</div><div><b>Ετοίμασε την απάντηση</b><span>Χρησιμοποίησε πρότυπο και έλεγξε τα στοιχεία.</span></div></div>
+     <div class="step"><div class="step-n">03</div><div><b>Στείλε και ενημέρωσε</b><span>Άνοιξε το email app και άλλαξε την κατάσταση χειροκίνητα.</span></div></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-leads">
+ <div class="notice">Τα αιτήματα αποθηκεύονται τοπικά σε αυτό το browser. Δεν συγχρονίζονται με άλλες συσκευές.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Αιτήματα κρατήσεων</h2><p class="desc">Διαχείριση αιτημάτων και κατάστασης</p></div><button class="btn gold" id="new-lead">+ Προσθήκη</button></div>
+  <div class="toolbar"><input id="search" class="field" placeholder="Αναζήτηση ονόματος ή email...">
+  <select id="filter" class="field"><option value="all">Όλες οι καταστάσεις</option><option value="open">Εκκρεμή</option><option value="confirmed">Επιβεβαιωμένα</option><option value="lost">Χαμένα</option></select></div>
+  <div class="lead-list" id="all-list"></div>
+ </div>
+</section>
+
+<section class="section" id="page-email">
+ <div class="notice">Το εργαλείο δημιουργεί πρότυπα από τα δεδομένα που εισάγεις. Δεν χρησιμοποιεί εξωτερικό AI και δεν στέλνει email αυτόματα.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Βοηθός email</h2><p class="desc">Σύνταξη απάντησης με ανθρώπινο έλεγχο</p></div></div>
+  <div class="form-grid">
+   <div class="form-group"><label>Αίτημα πελάτη</label><select class="field" id="email-lead"></select></div>
+   <div class="form-group"><label>Γλώσσα</label><select class="field" id="email-language"><option value="el">Ελληνικά</option><option value="en">English</option></select></div>
+   <div class="form-group"><label>Όνομα ξενοδοχείου</label><input class="field" id="hotel-name" placeholder="π.χ. Aegean House"></div>
+   <div class="form-group"><label>Τηλέφωνο / στοιχεία επικοινωνίας (προαιρετικά)</label><input class="field" id="hotel-contact" placeholder="Τηλέφωνο ή site"></div>
+   <div class="form-group full"><label>Πληροφορίες που έχουν επιβεβαιωθεί (προαιρετικά)</label><textarea class="field" id="verified-info" placeholder="π.χ. Θα σας απαντήσουμε για διαθεσιμότητα εντός της ημέρας. Μην εισάγεις στοιχεία που δεν έχεις επιβεβαιώσει."></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:15px 0"><button class="btn gold" id="generate-email">Δημιουργία προσχεδίου</button><button class="btn" id="clear-email">Καθαρισμός</button></div>
+  <div class="form-group"><label>Θέμα email</label><input id="email-subject" class="field"></div>
+  <div class="form-group" style="margin-top:12px"><label>Κείμενο email</label><div id="email-body" class="email-output">Επίλεξε αίτημα και πάτησε «Δημιουργία προσχεδίου».</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn" id="copy-email">Αντιγραφή κειμένου</button><button class="btn gold" id="open-mail">Άνοιγμα email app</button></div>
+ </div>
+</section>
+
+<section class="section" id="page-reports">
+ <div class="notice">Εξήγαγε μόνο δοκιμαστικά ή κατάλληλα προστατευμένα δεδομένα. Για πραγματικά στοιχεία πελατών απαιτούνται μέτρα ασφάλειας και συμμόρφωση με τον GDPR.</div>
+ <div class="layout">
+  <div class="panel"><h2>Εξαγωγή δεδομένων</h2><p class="desc">Κατέβασε αντίγραφο των αιτημάτων.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="btn gold" id="export-csv">Εξαγωγή CSV</button><button class="btn" id="export-json">Εξαγωγή JSON</button></div>
+  </div>
+  <div class="panel"><h2>Demo data</h2><p class="desc">Φόρτωσε δοκιμαστικά αιτήματα ή καθάρισε το workspace.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="btn" id="load-demo">Φόρτωση demo</button><button class="btn danger" id="delete-all">Διαγραφή όλων</button></div>
+  </div>
+ </div>
+ <div class="panel" style="margin-top:17px"><h2>Τι κάνει αυτή η έκδοση</h2><p class="desc">Online καταχώριση αιτημάτων μέσω Supabase, πρότυπα email, αλλαγή κατάστασης, αναζήτηση και εξαγωγή.</p>
+ <p class="desc">Τι δεν κάνει: αυτόματη ανάγνωση inbox, αποστολή email από server, real-time διαθεσιμότητα, σύνδεση PMS/CRM, AI API, αυτόματη ανάγνωση inbox, αποστολή email από server, σύνδεση PMS/CRM ή AI API.</p></div>
+</section>
+<div class="footer">CLIENT RESCUE AI · SUPABASE CLOUD BUILD · AUTHENTICATED WORKSPACE</div>
+</main>
+</div>
+
+<div class="auth-gate" id="auth-gate">
+ <div class="auth-card">
+  <div class="eyebrow">CLIENT RESCUE AI · SECURE ACCESS</div>
+  <h2>Σύνδεση στο workspace</h2>
+  <p>Τα αιτήματά σου αποθηκεύονται online και είναι ορατά μόνο στον λογαριασμό σου.</p>
+  <form id="auth-form">
+   <label for="auth-email">Email</label><input class="field" id="auth-email" type="email" autocomplete="email" required maxlength="180">
+   <label for="auth-password">Κωδικός πρόσβασης</label><input class="field" id="auth-password" type="password" autocomplete="current-password" minlength="8" required>
+   <div class="auth-actions"><button class="btn gold" type="submit" id="auth-submit">Σύνδεση</button><button class="btn" type="button" id="auth-signup">Δημιουργία λογαριασμού</button></div>
+  </form>
+  <div class="auth-message" id="auth-message" role="status"></div>
+  <p style="font-size:11px">Χρησιμοποίησε λογαριασμό δοκιμών. Μην καταχωρίζεις πραγματικά προσωπικά δεδομένα πελατών πριν ολοκληρωθεί ο έλεγχος ασφάλειας και GDPR.</p>
+ </div>
+</div>
+<div class="modal-back" id="modal-back">
+ <div class="modal">
+  <h2 id="modal-title">Νέο booking lead</h2><p class="subtitle" id="modal-subtitle">Συμπλήρωσε όσα στοιχεία γνωρίζεις.</p>
+  <form id="lead-form">
+   <div class="form-grid">
+    <div class="form-group"><label>Όνομα πελάτη *</label><input required id="f-name" class="field" maxlength="100"></div>
+    <div class="form-group"><label>Email *</label><input required type="email" id="f-email" class="field" maxlength="180"></div>
+    <div class="form-group"><label>Ημερομηνία άφιξης</label><input type="date" id="f-date" class="field"></div>
+    <div class="form-group"><label>Αριθμός ατόμων</label><input type="number" id="f-guests" class="field" min="1" max="30" value="2"></div>
+    <div class="form-group"><label>Εκτιμώμενη αξία (€)</label><input type="number" id="f-value" class="field" min="0" max="10000000" value="0"></div>
+    <div class="form-group"><label>Κατάσταση</label><select id="f-status" class="field"><option value="open">Εκκρεμές</option><option value="confirmed">Επιβεβαιωμένο</option><option value="lost">Χαμένο</option></select></div>
+    <div class="form-group full"><label>Σημειώσεις</label><textarea id="f-notes" class="field" maxlength="1000" placeholder="Μην καταχωρίζεις ευαίσθητα προσωπικά δεδομένα."></textarea></div>
+   </div>
+   <div class="modal-actions"><button type="button" class="btn" id="cancel-modal">Ακύρωση</button><button type="submit" class="btn gold" id="save-lead-button">Αποθήκευση αιτήματος</button></div>
+  </form>
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://rjtpjinusmqgyfeblvsm.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BgLpjLnVwAVmRd-9X2lxiA_tSO9HDGC';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let currentUser = null;
+const KEY = 'client_rescue_ai_demo_v1';
+const $ = id => document.getElementById(id);
+const money = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(n)||0);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const statusLabel = s => ({open:'Εκκρεμές',confirmed:'Επιβεβαιωμένο',lost:'Χαμένο'}[s]||s);
+function uid(){return 'L'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function showStorageWarning(show=true){
+const notice=$('storage-warning');
+if(notice) notice.hidden=!show;
+}
+function normalizeLead(l){return {
+id:typeof l.id==='string'&&l.id?l.id:uid(),
+name:String(l.name||'').slice(0,100),email:String(l.email||'').slice(0,180),
+date:typeof l.date==='string'?l.date:'',
+guests:Math.min(30,Math.max(1,Number(l.guests)||1)),
+value:Math.max(0,Number(l.value)||0),
+status:['open','confirmed','lost'].includes(l.status)?l.status:'open',
+notes:typeof l.notes==='string'?l.notes.slice(0,1000):'',
+created:Number.isFinite(Number(l.created))?Number(l.created):Date.now()
+}}
+let leads = [];
+let editingLeadId = null;
+async function loadCloud(){
+ if(!currentUser) throw new Error('Δεν υπάρχει συνδεδεμένος χρήστης.');
+ const {data,error}=await supabaseClient.from('leads').select('id,name,email,date,guests,value,status,notes,created').order('created',{ascending:false});
+ if(error) throw error;
+ leads=(data||[]).map(normalizeLead);
+ if(leads.length===0){
+  try{
+   const legacy=JSON.parse(localStorage.getItem(KEY)||'[]');
+   if(Array.isArray(legacy)&&legacy.length&&confirm('Βρέθηκαν '+legacy.length+' παλιά τοπικά αιτήματα. Θέλεις να τα αντιγράψεις στην online βάση του λογαριασμού σου;')){
+    leads=legacy.filter(x=>x&&typeof x.name==='string'&&typeof x.email==='string').map(normalizeLead);
+    if(leads.length) await save();
+   }
+  }catch(migrationError){console.warn('Local migration skipped:',migrationError)}
+ }
+ showStorageWarning(false);render();
+}
+async function save(){
+ if(!currentUser){showStorageWarning(true);alert('Συνδέσου πρώτα για να αποθηκεύσεις αιτήματα.');return false;}
+ try{
+  const rows=leads.map(l=>({...l,date:l.date||null,user_id:currentUser.id}));
+  if(rows.length){const {error}=await supabaseClient.from('leads').upsert(rows,{onConflict:'id'});if(error)throw error;}
+  const {data:existing,error:readError}=await supabaseClient.from('leads').select('id');
+  if(readError)throw readError;
+  const keep=new Set(leads.map(l=>l.id));
+  const remove=(existing||[]).map(x=>x.id).filter(id=>!keep.has(id));
+  if(remove.length){const {error}=await supabaseClient.from('leads').delete().in('id',remove);if(error)throw error;}
+  showStorageWarning(false);render();return true;
+ }catch(err){console.error('Supabase save failed:',err);showStorageWarning(true);alert('Δεν αποθηκεύτηκε στη βάση. Έλεγξε τη σύνδεση και τις πολιτικές RLS. Λεπτομέρειες: '+(err.message||'Άγνωστο σφάλμα'));return false;}
+}
+async function refreshAuth(){
+ const {data,error}=await supabaseClient.auth.getSession();
+ if(error)console.error(error);
+ currentUser=data?.session?.user||null;
+ $('auth-gate').style.display=currentUser?'none':'grid';
+ $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
+ $('sign-out').hidden=!currentUser;
+ if(currentUser){try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Δεν μπορώ να διαβάσω τον πίνακα leads. Εκτέλεσε πρώτα το αρχείο SQL που συνοδεύει την εφαρμογή. '+(err.message||''));}}
+}
+$('auth-form').addEventListener('submit',async e=>{
+ e.preventDefault();$('auth-message').textContent='Γίνεται σύνδεση…';
+ const email=$('auth-email').value.trim(),password=$('auth-password').value;
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+ if(error){$('auth-message').textContent='Αποτυχία σύνδεσης: '+error.message;return;}
+ currentUser=data.user;await refreshAuth();$('auth-message').textContent='';
+});
+$('auth-signup').addEventListener('click',async()=>{
+ const email=$('auth-email').value.trim(),password=$('auth-password').value;
+ if(!email||password.length<8){$('auth-message').textContent='Συμπλήρωσε email και κωδικό τουλάχιστον 8 χαρακτήρων.';return;}
+ $('auth-message').textContent='Δημιουργία λογαριασμού…';
+ const {data,error}=await supabaseClient.auth.signUp({email,password});
+ if(error){$('auth-message').textContent='Σφάλμα: '+error.message;return;}
+ if(data.session){currentUser=data.user;await refreshAuth();$('auth-message').textContent='';}
+ else $('auth-message').textContent='Ο λογαριασμός δημιουργήθηκε. Έλεγξε το email σου για επιβεβαίωση και μετά συνδέσου.';
+});
+$('sign-out').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentUser=null;leads=[];render();$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
+supabaseClient.auth.onAuthStateChange((_event,session)=>{
+ currentUser=session?.user||null;
+ $('auth-gate').style.display=currentUser?'none':'grid';
+ $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
+ $('sign-out').hidden=!currentUser;
+ if(currentUser) setTimeout(()=>loadCloud().catch(err=>{console.error(err);showStorageWarning(true)}),0);
+});
+function demoData(){return [
+{id:uid(),name:'Maria Papadopoulou',email:'maria.demo@example.com',date:'2026-11-12',guests:2,value:420,status:'open',notes:'Ζήτησε δίκλινο για 3 διανυκτερεύσεις.',created:Date.now()-300000},
+{id:uid(),name:'James Wilson',email:'james.demo@example.com',date:'2026-12-04',guests:2,value:680,status:'open',notes:'Ρώτησε για διαμονή και πρωινό.',created:Date.now()-200000},
+{id:uid(),name:'Eleni Nikolaou',email:'eleni.demo@example.com',date:'2026-10-28',guests:3,value:350,status:'confirmed',notes:'Demo επιβεβαιωμένη κράτηση.',created:Date.now()-100000},
+{id:uid(),name:'Alex Morgan',email:'alex.demo@example.com',date:'2026-11-20',guests:1,value:210,status:'lost',notes:'Demo αίτημα που δεν προχώρησε.',created:Date.now()}
+]}
+function leadCard(l){
+return `<article class="lead"><div class="lead-top"><div><div class="lead-name">${esc(l.name)}</div><div class="lead-email">${esc(l.email)}</div></div><div class="money">${money(l.value)}</div></div>
+<div class="lead-meta"><span class="tag ${esc(l.status)}">${statusLabel(l.status)}</span><span class="tag">${l.date?esc(l.date):'Ημ/νία μη ορισμένη'}</span><span class="tag">${Number(l.guests)||1} άτομα</span></div>
+${l.notes?`<p class="desc">${esc(l.notes)}</p>`:''}
+<div class="lead-actions"><button class="btn" data-email="${esc(l.id)}">Email draft</button><button class="btn edit-action" type="button" data-edit="${esc(l.id)}" aria-label="Επεξεργασία αιτήματος ${esc(l.name)}">✎ Επεξεργασία</button><button class="btn" data-status="${esc(l.id)}">Αλλαγή status</button><button class="btn danger" data-delete="${esc(l.id)}">Διαγραφή</button></div></article>`
+}
+function render(){
+$('stat-total').textContent=leads.length;
+$('stat-open').textContent=leads.filter(l=>l.status==='open').length;
+$('stat-confirmed').textContent=leads.filter(l=>l.status==='confirmed').length;
+$('stat-value').textContent=money(leads.reduce((s,l)=>s+(Number(l.value)||0),0));
+$('rescue-count').textContent=leads.filter(l=>l.status==='open').length+' ανοιχτά';
+$('recent-list').innerHTML=leads.slice().sort((a,b)=>b.created-a.created).slice(0,3).map(leadCard).join('')||'<div class="empty">Δεν υπάρχουν αιτήματα. Πρόσθεσε ένα ή φόρτωσε demo data.</div>';
+const q=$('search').value.toLowerCase(), f=$('filter').value;
+const filtered=leads.filter(l=>(f==='all'||l.status===f)&&[l.name,l.email,l.notes].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.created-a.created);
+$('all-list').innerHTML=filtered.map(leadCard).join('')||'<div class="empty">Δεν βρέθηκαν αιτήματα.</div>';
+const current=$('email-lead').value;
+$('email-lead').innerHTML=leads.map(l=>`<option value="${esc(l.id)}">${esc(l.name)} — ${esc(l.email)}</option>`).join('');
+if(leads.some(l=>l.id===current))$('email-lead').value=current;
+}
+function showPage(name){
+const titles={dashboard:['Επισκόπηση εσόδων','Μια καθαρή εικόνα των αιτημάτων κρατήσεων.'],leads:['Αιτήματα κρατήσεων','Οργάνωσε τα αιτήματα και τις επόμενες ενέργειες.'],email:['Βοηθός email','Δημιούργησε ένα προσχέδιο και έλεγξέ το πριν σταλεί.'],reports:['Αναφορές & δεδομένα','Εξαγωγή, δοκιμαστικά δεδομένα και πληροφορίες demo.']};
+if(!titles[name]) return;
+document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='page-'+name));
+document.querySelectorAll('.nav').forEach(n=>{
+const active=n.dataset.page===name;
+n.classList.toggle('active',active);
+if(active)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current');
+});
+$('page-title').textContent=titles[name][0];$('page-subtitle').textContent=titles[name][1];
+}
+function openModal(){
+editingLeadId = null;
+$('lead-form').reset();
+$('modal-title').textContent='Νέο booking lead';
+$('modal-subtitle').textContent='Συμπλήρωσε όσα στοιχεία γνωρίζεις.';
+$('save-lead-button').textContent='Αποθήκευση αιτήματος';
+$('modal-back').classList.add('show');$('f-name').focus()
+}
+function openEditModal(id){
+const l=leads.find(x=>x.id===id);if(!l)return;
+editingLeadId=id;
+$('modal-title').textContent='Επεξεργασία αιτήματος';
+$('modal-subtitle').textContent='Οι αλλαγές θα ενημερώσουν την υπάρχουσα καταχώριση χωρίς να δημιουργηθεί νέο αίτημα.';
+$('save-lead-button').textContent='Αποθήκευση αλλαγών';
+$('f-name').value=l.name;$('f-email').value=l.email;$('f-date').value=l.date;
+$('f-guests').value=l.guests;$('f-value').value=l.value;$('f-status').value=l.status;$('f-notes').value=l.notes;
+$('modal-back').classList.add('show');$('f-name').focus()
+}
+function closeModal(){ $('modal-back').classList.remove('show');$('lead-form').reset();editingLeadId=null;$('modal-title').textContent='Νέο booking lead';$('modal-subtitle').textContent='Συμπλήρωσε όσα στοιχεία γνωρίζεις.';$('save-lead-button').textContent='Αποθήκευση αιτήματος'}
+
+function setEmailLead(id){showPage('email');$('email-lead').value=id;generateEmail()}
+function generateEmail(){
+const l=leads.find(x=>x.id===$('email-lead').value);
+if(!l){$('email-subject').value='';$('email-body').textContent='Πρόσθεσε ή επίλεξε ένα αίτημα πρώτα.';return}
+const en=$('email-language').value==='en', hotel=$('hotel-name').value.trim()|| (en?'our hotel':'το ξενοδοχείο μας');
+const extra=$('verified-info').value.trim();
+$('email-subject').value=en?'Your accommodation enquiry':'Το αίτημά σας για διαμονή';
+const date=l.date|| (en?'your preferred dates':'τις ημερομηνίες που επιθυμείτε');
+let body;
+if(en){
+body=`Dear ${l.name},\n\nThank you for contacting ${hotel} about your stay for ${l.guests||2} guest(s), around ${date}.\n\nWe would be happy to assist with your enquiry. We will need to verify availability and the applicable rate before confirming any booking.${extra?'\n\nAdditional information:\n'+extra:''}\n\nPlease let us know if you have any other preferences.\n\nKind regards,\n${hotel}${$('hotel-contact').value.trim()?'\n'+$('hotel-contact').value.trim():''}`;
+}else{
+body=`Αγαπητέ/ή ${l.name},\n\nΣας ευχαριστούμε που επικοινωνήσατε με ${hotel} σχετικά με τη διαμονή ${l.guests||2} ατόμου/ων για ${date}.\n\nΘα χαρούμε να σας εξυπηρετήσουμε. Πριν επιβεβαιώσουμε οποιαδήποτε κράτηση, χρειάζεται να ελέγξουμε τη διαθεσιμότητα και την ισχύουσα τιμή.${extra?'\n\nΠρόσθετες πληροφορίες:\n'+extra:''}\n\nΠαραμένουμε στη διάθεσή σας για οποιαδήποτε διευκρίνιση.\n\nΜε εκτίμηση,\n${hotel}${$('hotel-contact').value.trim()?'\n'+$('hotel-contact').value.trim():''}`;
+}
+$('email-body').textContent=body;
+}
+function download(name,text,type){
+const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>showPage(n.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.goto)));
+$('new-lead').onclick=openModal;$('new-lead-top').onclick=openModal;
+$('cancel-modal').onclick=closeModal;
+$('modal-back').addEventListener('click',e=>{if(e.target===$('modal-back'))closeModal()});
+$('lead-form').addEventListener('submit',async e=>{
+e.preventDefault();
+const data={name:$('f-name').value.trim(),email:$('f-email').value.trim(),
+date:$('f-date').value,guests:Number($('f-guests').value)||1,value:Number($('f-value').value)||0,
+status:$('f-status').value,notes:$('f-notes').value.trim()};
+if(editingLeadId){
+const index=leads.findIndex(l=>l.id===editingLeadId);
+if(index===-1){alert('Το αίτημα δεν βρέθηκε. Άνοιξε ξανά τη λίστα και δοκίμασε πάλι.');closeModal();return}
+leads[index]={...leads[index],...data};
+}else{
+leads.push({id:uid(),...data,created:Date.now()});
+}
+const ok=await save();if(ok){closeModal();showPage('leads');}
+});
+$('search').addEventListener('input',render);$('filter').addEventListener('change',render);
+document.addEventListener('click',async e=>{
+const email=e.target.closest('[data-email]');if(email){setEmailLead(email.dataset.email);return}
+const edit=e.target.closest('[data-edit]');if(edit){openEditModal(edit.dataset.edit);return}
+const status=e.target.closest('[data-status]');if(status){
+const l=leads.find(x=>x.id===status.dataset.status);if(!l)return;
+const choices=['open','confirmed','lost'];l.status=choices[(choices.indexOf(l.status)+1)%choices.length];await save();return}
+const del=e.target.closest('[data-delete]');if(del&&confirm('Να διαγραφεί αυτό το αίτημα;')){
+leads=leads.filter(l=>l.id!==del.dataset.delete);await save()}
+});
+$('generate-email').onclick=generateEmail;
+$('email-language').onchange=generateEmail;
+$('email-lead').onchange=generateEmail;
+$('hotel-name').oninput=()=>{};
+$('clear-email').onclick=()=>{$('email-subject').value='';$('email-body').textContent='Επίλεξε αίτημα και πάτησε «Δημιουργία προσχεδίου».'};
+$('copy-email').onclick=async()=>{
+const text='Subject: '+$('email-subject').value+'\n\n'+$('email-body').textContent;
+try{await navigator.clipboard.writeText(text);alert('Το κείμενο αντιγράφηκε.')}catch{prompt('Αντέγραψε το κείμενο:',text)}
+};
+$('open-mail').onclick=()=>{
+const l=leads.find(x=>x.id===$('email-lead').value);if(!l)return alert('Επίλεξε αίτημα πρώτα.');
+const subject=$('email-subject').value.trim();
+const body=$('email-body').textContent.trim();
+// Open Gmail's compose screen with the recipient, subject and body prefilled.
+// Gmail still requires the user to review and click Send; this is not a background sender.
+const params=new URLSearchParams({to:l.email||'',su:subject,body:body,tf:'cm'});
+window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener');
+};
+$('load-demo').onclick=async()=>{if(!confirm('Να προστεθούν δοκιμαστικά αιτήματα;'))return;leads=leads.concat(demoData());await save()};
+$('delete-all').onclick=async()=>{if(confirm('Να διαγραφούν όλα τα αποθηκευμένα αιτήματα;')){leads=[];await save()}};
+$('export-json').onclick=()=>download('client-rescue-leads.json',JSON.stringify(leads,null,2),'application/json');
+$('export-csv').onclick=()=>{
+const cols=['name','email','date','guests','value','status','notes'];
+const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+const csv=[cols.join(','),...leads.map(l=>cols.map(c=>quote(l[c])).join(','))].join('\r\n');
+download('client-rescue-leads.csv','\ufeff'+csv,'text/csv;charset=utf-8');
+};
+
+/* Βοήθεια, μεγαλύτερα γράμματα και εύκολη πλοήγηση */
+(function setupAccessibilityAndHelp() {
+  const sizeButton = $('readability-toggle');
+  const helpButton = $('help-toggle');
+  const helpPanel = $('quick-help');
+  const helpClose = $('help-close');
+
+  try {
+    if (localStorage.getItem('client_rescue_large_text') === 'true') {
+      document.body.classList.add('large-text');
+      if (sizeButton) { sizeButton.setAttribute('aria-pressed','true'); sizeButton.textContent = 'ΑΑ Κανονικά γράμματα'; }
+    }
+  } catch (_) {}
+
+  if (sizeButton) sizeButton.addEventListener('click', () => {
+    const enabled = document.body.classList.toggle('large-text');
+    sizeButton.setAttribute('aria-pressed', String(enabled));
+    sizeButton.textContent = enabled ? 'ΑΑ Κανονικά γράμματα' : 'ΑΑ Μεγαλύτερα γράμματα';
+    try { localStorage.setItem('client_rescue_large_text', String(enabled)); } catch (_) {}
+  });
+
+  const closeHelp = () => {
+    if (!helpButton || !helpPanel) return;
+    helpPanel.hidden = true;
+    helpButton.setAttribute('aria-expanded','false');
+    helpButton.focus();
+  };
+  if (helpButton) helpButton.addEventListener('click', () => {
+    if (!helpPanel) return;
+    helpPanel.hidden = !helpPanel.hidden;
+    helpButton.setAttribute('aria-expanded', String(!helpPanel.hidden));
+    if (!helpPanel.hidden) helpPanel.focus();
+  });
+  if (helpClose) helpClose.addEventListener('click', closeHelp);
+
+  const welcomeNew = $('welcome-new-lead');
+  const welcomeLeads = $('welcome-open-leads');
+  if (welcomeNew) welcomeNew.addEventListener('click', openModal);
+  if (welcomeLeads) welcomeLeads.addEventListener('click', () => {
+    showPage('leads');
+    $('search').focus();
+  });
+
+  document.querySelectorAll('.nav').forEach(n => {
+    n.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showPage(n.dataset.page);
+        document.querySelectorAll('.nav').forEach(item => item.removeAttribute('aria-current'));
+        n.setAttribute('aria-current','page');
+      }
+    });
+    n.addEventListener('click', () => {
+      document.querySelectorAll('.nav').forEach(item => item.removeAttribute('aria-current'));
+      n.setAttribute('aria-current','page');
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && helpPanel && !helpPanel.hidden) closeHelp();
+  });
+})();
+
+render();
+refreshAuth();
+</script>
+</body>
+</html>
