@@ -222,7 +222,7 @@ font-size:12px;color:#e9e5dc}
 <header class="topbar">
  <div><div class="eyebrow">Hospitality · Revenue operations</div><h1 id="page-title">Επισκόπηση εσόδων</h1>
  <p class="subtitle" id="page-subtitle">Μια καθαρή εικόνα των αιτημάτων κρατήσεων.</p></div>
- <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
+ <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><select class="btn" id="hotel-switcher" aria-label="Επιλογή ξενοδοχείου" hidden></select><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
 </header>
 
 
@@ -346,6 +346,8 @@ const SUPABASE_URL = 'https://rjtpjinusmqgyfeblvsm.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BgLpjLnVwAVmRd-9X2lxiA_tSO9HDGC';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 let currentUser = null;
+let activeHotelId = null;
+let hotelMemberships = [];
 const KEY = 'client_rescue_ai_demo_v1';
 const $ = id => document.getElementById(id);
 const money = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(n)||0);
@@ -364,13 +366,27 @@ guests:Math.min(30,Math.max(1,Number(l.guests)||1)),
 value:Math.max(0,Number(l.value)||0),
 status:['open','confirmed','lost'].includes(l.status)?l.status:'open',
 notes:typeof l.notes==='string'?l.notes.slice(0,1000):'',
-created:Number.isFinite(Number(l.created))?Number(l.created):Date.now()
+created:Number.isFinite(Number(l.created))?Number(l.created):Date.now(),
+hotel_id:l.hotel_id||null,user_id:l.user_id||null
 }}
 let leads = [];
 let editingLeadId = null;
 async function loadCloud(){
  if(!currentUser) throw new Error('Δεν υπάρχει συνδεδεμένος χρήστης.');
- const {data,error}=await supabaseClient.from('leads').select('id,name,email,date,guests,value,status,notes,created').order('created',{ascending:false});
+ const {data:members,error:memberError}=await supabaseClient
+  .from('hotel_members').select('hotel_id,role,hotels(name)').eq('user_id',currentUser.id);
+ if(memberError) throw memberError;
+ hotelMemberships=members||[];
+ const switcher=$('hotel-switcher');
+ if(!hotelMemberships.length){activeHotelId=null;switcher.hidden=true;throw new Error('Ο λογαριασμός δεν έχει συνδεθεί ακόμη με ξενοδοχείο. Ζήτησε από τον διαχειριστή να σε προσθέσει.');}
+ if(!hotelMemberships.some(m=>m.hotel_id===activeHotelId)) activeHotelId=hotelMemberships[0].hotel_id;
+ switcher.innerHTML=hotelMemberships.map(m=>`<option value="${esc(m.hotel_id)}">${esc(m.hotels?.name||'Ξενοδοχείο')}</option>`).join('');
+ switcher.value=activeHotelId;switcher.hidden=hotelMemberships.length<2;
+ const activeMembership=hotelMemberships.find(m=>m.hotel_id===activeHotelId);
+ if(activeMembership?.hotels?.name && !$('hotel-name').value.trim()) $('hotel-name').value=activeMembership.hotels.name;
+ const {data,error}=await supabaseClient.from('leads')
+  .select('id,name,email,date,guests,value,status,notes,created,hotel_id,user_id')
+  .eq('hotel_id',activeHotelId).order('created',{ascending:false});
  if(error) throw error;
  leads=(data||[]).map(normalizeLead);
  if(leads.length===0){
@@ -387,9 +403,10 @@ async function loadCloud(){
 async function save(){
  if(!currentUser){showStorageWarning(true);alert('Συνδέσου πρώτα για να αποθηκεύσεις αιτήματα.');return false;}
  try{
-  const rows=leads.map(l=>({...l,date:l.date||null,user_id:currentUser.id}));
+  if(!activeHotelId) throw new Error('Δεν έχει επιλεγεί ξενοδοχείο.');
+  const rows=leads.map(l=>({...l,date:l.date||null,hotel_id:activeHotelId,user_id:l.user_id||currentUser.id}));
   if(rows.length){const {error}=await supabaseClient.from('leads').upsert(rows,{onConflict:'id'});if(error)throw error;}
-  const {data:existing,error:readError}=await supabaseClient.from('leads').select('id');
+  const {data:existing,error:readError}=await supabaseClient.from('leads').select('id').eq('hotel_id',activeHotelId);
   if(readError)throw readError;
   const keep=new Set(leads.map(l=>l.id));
   const remove=(existing||[]).map(x=>x.id).filter(id=>!keep.has(id));
@@ -404,7 +421,7 @@ async function refreshAuth(){
  $('auth-gate').style.display=currentUser?'none':'grid';
  $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
  $('sign-out').hidden=!currentUser;
- if(currentUser){try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Δεν μπορώ να διαβάσω τον πίνακα leads. Εκτέλεσε πρώτα το αρχείο SQL που συνοδεύει την εφαρμογή. '+(err.message||''));}}
+ if(currentUser){try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Πρόβλημα φόρτωσης ξενοδοχείου ή αιτημάτων: '+(err.message||''));}}
 }
 $('auth-form').addEventListener('submit',async e=>{
  e.preventDefault();$('auth-message').textContent='Γίνεται σύνδεση…';
@@ -422,13 +439,14 @@ $('auth-signup').addEventListener('click',async()=>{
  if(data.session){currentUser=data.user;await refreshAuth();$('auth-message').textContent='';}
  else $('auth-message').textContent='Ο λογαριασμός δημιουργήθηκε. Έλεγξε το email σου για επιβεβαίωση και μετά συνδέσου.';
 });
-$('sign-out').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentUser=null;leads=[];render();$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
+$('hotel-switcher').addEventListener('change',async e=>{activeHotelId=e.target.value;try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Δεν φορτώθηκαν τα αιτήματα: '+(err.message||''));}});
+$('sign-out').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentUser=null;activeHotelId=null;hotelMemberships=[];leads=[];render();$('hotel-switcher').hidden=true;$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
 supabaseClient.auth.onAuthStateChange((_event,session)=>{
  currentUser=session?.user||null;
  $('auth-gate').style.display=currentUser?'none':'grid';
  $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
  $('sign-out').hidden=!currentUser;
- if(currentUser) setTimeout(()=>loadCloud().catch(err=>{console.error(err);showStorageWarning(true)}),0);
+ if(currentUser) setTimeout(()=>loadCloud().catch(err=>{console.error(err);showStorageWarning(true);alert('Πρόβλημα φόρτωσης: '+(err.message||''))}),0);
 });
 function demoData(){return [
 {id:uid(),name:'Maria Papadopoulou',email:'maria.demo@example.com',date:'2026-11-12',guests:2,value:420,status:'open',notes:'Ζήτησε δίκλινο για 3 διανυκτερεύσεις.',created:Date.now()-300000},
