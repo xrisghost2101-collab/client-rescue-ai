@@ -217,12 +217,13 @@ font-size:12px;color:#e9e5dc}
   <div class="nav" data-page="leads" role="button" tabindex="0"><span class="ico">◎</span> Αιτήματα κρατήσεων</div>
   <div class="nav" data-page="email" role="button" tabindex="0"><span class="ico">✉</span> Βοηθός email</div>
   <div class="nav" data-page="reports" role="button" tabindex="0"><span class="ico">↗</span> Αναφορές & δεδομένα</div>
+  <div class="nav" data-page="team" id="team-nav" role="button" tabindex="0" hidden><span class="ico">♙</span> Ομάδα ξενοδοχείου</div>
 </aside>
 <main class="main">
 <header class="topbar">
  <div><div class="eyebrow">Hospitality · Revenue operations</div><h1 id="page-title">Επισκόπηση εσόδων</h1>
  <p class="subtitle" id="page-subtitle">Μια καθαρή εικόνα των αιτημάτων κρατήσεων.</p></div>
- <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><select class="btn" id="hotel-switcher" aria-label="Επιλογή ξενοδοχείου" hidden></select><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
+ <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><span class="pill" id="role-pill" hidden></span><select class="btn" id="hotel-switcher" aria-label="Επιλογή ξενοδοχείου" hidden></select><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
 </header>
 
 
@@ -238,7 +239,7 @@ font-size:12px;color:#e9e5dc}
  </section>
 
 <section class="section active" id="page-dashboard">
- <div class="notice">CLOUD WORKSPACE · Τα αιτήματα αποθηκεύονται στον προσωπικό σου λογαριασμό Supabase. Δεν συνδέεται ακόμη με πραγματικό inbox ή PMS.</div>
+ <div class="notice">CLOUD WORKSPACE · Τα αιτήματα αποθηκεύονται online στο ενεργό ξενοδοχείο σου μέσω Supabase. Δεν συνδέεται ακόμη με πραγματικό inbox ή PMS.</div>
  <div class="stats">
   <div class="stat"><div class="stat-top">Σύνολο αιτημάτων <span class="stat-icon">◎</span></div><div class="stat-number" id="stat-total">0</div><div class="stat-foot">Καταχωρισμένα αιτήματα</div></div>
   <div class="stat"><div class="stat-top">Εκκρεμή <span class="stat-icon">◷</span></div><div class="stat-number" id="stat-open">0</div><div class="stat-foot">Χρειάζονται ενέργεια</div></div>
@@ -264,7 +265,7 @@ font-size:12px;color:#e9e5dc}
 </section>
 
 <section class="section" id="page-leads">
- <div class="notice">Τα αιτήματα αποθηκεύονται τοπικά σε αυτό το browser. Δεν συγχρονίζονται με άλλες συσκευές.</div>
+ <div class="notice">Τα αιτήματα αποθηκεύονται online στο ενεργό ξενοδοχείο μέσω Supabase.</div>
  <div class="panel">
   <div class="panel-head"><div><h2>Αιτήματα κρατήσεων</h2><p class="desc">Διαχείριση αιτημάτων και κατάστασης</p></div><button class="btn gold" id="new-lead">+ Προσθήκη</button></div>
   <div class="toolbar"><input id="search" class="field" placeholder="Αναζήτηση ονόματος ή email...">
@@ -291,6 +292,21 @@ font-size:12px;color:#e9e5dc}
  </div>
 </section>
 
+<section class="section" id="page-team">
+ <div class="notice">Διαχείριση μελών που έχουν ήδη δημιουργήσει λογαριασμό στο Client Rescue AI. Για προσθήκη χρειάζεται το User ID τους από το Supabase Auth.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Μέλη ξενοδοχείου</h2><p class="desc">Ρόλοι και πρόσβαση στο ενεργό ξενοδοχείο.</p></div></div>
+  <div id="team-list" class="lead-list"></div>
+ </div>
+ <div class="panel" id="team-add-panel" style="margin-top:17px">
+  <h2>Προσθήκη μέλους</h2><p class="desc">Το άτομο πρέπει να έχει ήδη λογαριασμό.</p>
+  <form id="team-add-form" class="form-grid" style="margin-top:14px">
+   <div class="form-group"><label for="team-user-id">User ID από Supabase Auth</label><input class="field" id="team-user-id" required placeholder="UUID χρήστη"></div>
+   <div class="form-group"><label for="team-role">Ρόλος</label><select class="field" id="team-role"><option value="staff">Staff</option><option value="admin">Admin</option></select></div>
+   <div class="form-group full"><button class="btn gold" type="submit">Προσθήκη μέλους</button></div>
+  </form>
+ </div>
+</section>
 <section class="section" id="page-reports">
  <div class="notice">Εξήγαγε μόνο δοκιμαστικά ή κατάλληλα προστατευμένα δεδομένα. Για πραγματικά στοιχεία πελατών απαιτούνται μέτρα ασφάλειας και συμμόρφωση με τον GDPR.</div>
  <div class="layout">
@@ -348,6 +364,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLI
 let currentUser = null;
 let activeHotelId = null;
 let hotelMemberships = [];
+let currentRole = null;
+let hotelMembers = [];
 const KEY = 'client_rescue_ai_demo_v1';
 const $ = id => document.getElementById(id);
 const money = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(n)||0);
@@ -371,18 +389,42 @@ hotel_id:l.hotel_id||null,user_id:l.user_id||null
 }}
 let leads = [];
 let editingLeadId = null;
+function canManageMembers(){return currentRole==='owner'||currentRole==='admin';}
+function canDeleteLeads(){return currentRole==='owner'||currentRole==='admin';}
+function applyRoleUI(){
+ const isManager=canManageMembers();
+ $('role-pill').hidden=!currentRole;
+ $('role-pill').textContent=currentRole?({owner:'OWNER',admin:'ADMIN',staff:'STAFF'}[currentRole]||currentRole.toUpperCase()):'';
+ $('team-nav').hidden=!isManager;
+ $('new-lead-top').hidden=!currentRole;
+ $('new-lead').hidden=!currentRole;
+ $('welcome-new-lead').hidden=!currentRole;
+ $('team-add-panel').hidden=!isManager;
+ $('delete-all').hidden=!canDeleteLeads();
+ render();
+}
+async function loadTeam(){
+ if(!canManageMembers()){hotelMembers=[];return;}
+ const {data,error}=await supabaseClient.from('hotel_members')
+  .select('id,user_id,role').eq('hotel_id',activeHotelId).order('created_at');
+ if(error)throw error;
+ hotelMembers=data||[];
+ $('team-list').innerHTML=hotelMembers.map(m=>`<article class="lead"><div class="lead-top"><div><div class="lead-name">${esc(m.role.toUpperCase())}</div><div class="lead-email">${esc(m.user_id)}</div></div><div class="lead-actions">${m.role!=='owner'?`<button class="btn danger" data-remove-member="${esc(m.id)}">Αφαίρεση</button>`:'<span class="tag confirmed">Ιδιοκτήτης</span>'}</div></div></article>`).join('')||'<div class="empty">Δεν υπάρχουν μέλη.</div>';
+}
 async function loadCloud(){
  if(!currentUser) throw new Error('Δεν υπάρχει συνδεδεμένος χρήστης.');
  const {data:members,error:memberError}=await supabaseClient
-  .from('hotel_members').select('hotel_id,role,hotels(name)').eq('user_id',currentUser.id);
+  .from('hotel_members').select('hotel_id,user_id,role,hotels(name)').eq('user_id',currentUser.id);
  if(memberError) throw memberError;
  hotelMemberships=members||[];
  const switcher=$('hotel-switcher');
- if(!hotelMemberships.length){activeHotelId=null;switcher.hidden=true;throw new Error('Ο λογαριασμός δεν έχει συνδεθεί ακόμη με ξενοδοχείο. Ζήτησε από τον διαχειριστή να σε προσθέσει.');}
+ if(!hotelMemberships.length){activeHotelId=null;currentRole=null;switcher.hidden=true;applyRoleUI();throw new Error('Ο λογαριασμός δεν έχει συνδεθεί ακόμη με ξενοδοχείο. Ζήτησε από τον διαχειριστή να σε προσθέσει.');}
  if(!hotelMemberships.some(m=>m.hotel_id===activeHotelId)) activeHotelId=hotelMemberships[0].hotel_id;
  switcher.innerHTML=hotelMemberships.map(m=>`<option value="${esc(m.hotel_id)}">${esc(m.hotels?.name||'Ξενοδοχείο')}</option>`).join('');
  switcher.value=activeHotelId;switcher.hidden=hotelMemberships.length<2;
  const activeMembership=hotelMemberships.find(m=>m.hotel_id===activeHotelId);
+ currentRole=activeMembership?.role||null;
+ applyRoleUI();
  if(activeMembership?.hotels?.name && !$('hotel-name').value.trim()) $('hotel-name').value=activeMembership.hotels.name;
  const {data,error}=await supabaseClient.from('leads')
   .select('id,name,email,date,guests,value,status,notes,created,hotel_id,user_id')
@@ -393,26 +435,28 @@ async function loadCloud(){
   try{
    const legacy=JSON.parse(localStorage.getItem(KEY)||'[]');
    if(Array.isArray(legacy)&&legacy.length&&confirm('Βρέθηκαν '+legacy.length+' παλιά τοπικά αιτήματα. Θέλεις να τα αντιγράψεις στην online βάση του λογαριασμού σου;')){
-    leads=legacy.filter(x=>x&&typeof x.name==='string'&&typeof x.email==='string').map(normalizeLead);
-    if(leads.length) await save();
+    const rows=legacy.filter(x=>x&&typeof x.name==='string'&&typeof x.email==='string').map(x=>{const l=normalizeLead(x);return {name:l.name,email:l.email,date:l.date||null,guests:l.guests,value:l.value,status:l.status,notes:l.notes,created:l.created,hotel_id:activeHotelId,user_id:currentUser.id};});
+    if(rows.length){const {error:insertError}=await supabaseClient.from('leads').insert(rows);if(insertError)throw insertError;const {data:reloaded,error:reloadError}=await supabaseClient.from('leads').select('id,name,email,date,guests,value,status,notes,created,hotel_id,user_id').eq('hotel_id',activeHotelId).order('created',{ascending:false});if(reloadError)throw reloadError;leads=(reloaded||[]).map(normalizeLead);}
    }
   }catch(migrationError){console.warn('Local migration skipped:',migrationError)}
  }
+ await loadTeam();
  showStorageWarning(false);render();
 }
-async function save(){
- if(!currentUser){showStorageWarning(true);alert('Συνδέσου πρώτα για να αποθηκεύσεις αιτήματα.');return false;}
- try{
-  if(!activeHotelId) throw new Error('Δεν έχει επιλεγεί ξενοδοχείο.');
-  const rows=leads.map(l=>({...l,date:l.date||null,hotel_id:activeHotelId,user_id:l.user_id||currentUser.id}));
-  if(rows.length){const {error}=await supabaseClient.from('leads').upsert(rows,{onConflict:'id'});if(error)throw error;}
-  const {data:existing,error:readError}=await supabaseClient.from('leads').select('id').eq('hotel_id',activeHotelId);
-  if(readError)throw readError;
-  const keep=new Set(leads.map(l=>l.id));
-  const remove=(existing||[]).map(x=>x.id).filter(id=>!keep.has(id));
-  if(remove.length){const {error}=await supabaseClient.from('leads').delete().in('id',remove);if(error)throw error;}
-  showStorageWarning(false);render();return true;
- }catch(err){console.error('Supabase save failed:',err);showStorageWarning(true);alert('Δεν αποθηκεύτηκε στη βάση. Έλεγξε τη σύνδεση και τις πολιτικές RLS. Λεπτομέρειες: '+(err.message||'Άγνωστο σφάλμα'));return false;}
+async function persistLead(lead,isNew=false){
+ if(!currentUser||!activeHotelId)throw new Error('Δεν υπάρχει ενεργό ξενοδοχείο ή χρήστης.');
+ if(isNew){
+  const row={name:lead.name,email:lead.email,date:lead.date||null,guests:lead.guests,value:lead.value,status:lead.status,notes:lead.notes,created:lead.created,hotel_id:activeHotelId,user_id:currentUser.id};
+  const {data,error}=await supabaseClient.from('leads').insert(row).select('id,name,email,date,guests,value,status,notes,created,hotel_id,user_id').single();
+  if(error)throw error;return normalizeLead(data);
+ }
+ const {data,error}=await supabaseClient.from('leads').update({name:lead.name,email:lead.email,date:lead.date||null,guests:lead.guests,value:lead.value,status:lead.status,notes:lead.notes})
+  .eq('id',lead.id).eq('hotel_id',activeHotelId).select('id,name,email,date,guests,value,status,notes,created,hotel_id,user_id').single();
+ if(error)throw error;return normalizeLead(data);
+}
+async function deleteLead(id){
+ const {error}=await supabaseClient.from('leads').delete().eq('id',id).eq('hotel_id',activeHotelId);
+ if(error)throw error;
 }
 async function refreshAuth(){
  const {data,error}=await supabaseClient.auth.getSession();
@@ -440,7 +484,7 @@ $('auth-signup').addEventListener('click',async()=>{
  else $('auth-message').textContent='Ο λογαριασμός δημιουργήθηκε. Έλεγξε το email σου για επιβεβαίωση και μετά συνδέσου.';
 });
 $('hotel-switcher').addEventListener('change',async e=>{activeHotelId=e.target.value;try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Δεν φορτώθηκαν τα αιτήματα: '+(err.message||''));}});
-$('sign-out').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentUser=null;activeHotelId=null;hotelMemberships=[];leads=[];render();$('hotel-switcher').hidden=true;$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
+$('sign-out').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentUser=null;activeHotelId=null;hotelMemberships=[];currentRole=null;hotelMembers=[];leads=[];applyRoleUI();$('hotel-switcher').hidden=true;$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
 supabaseClient.auth.onAuthStateChange((_event,session)=>{
  currentUser=session?.user||null;
  $('auth-gate').style.display=currentUser?'none':'grid';
@@ -458,7 +502,7 @@ function leadCard(l){
 return `<article class="lead"><div class="lead-top"><div><div class="lead-name">${esc(l.name)}</div><div class="lead-email">${esc(l.email)}</div></div><div class="money">${money(l.value)}</div></div>
 <div class="lead-meta"><span class="tag ${esc(l.status)}">${statusLabel(l.status)}</span><span class="tag">${l.date?esc(l.date):'Ημ/νία μη ορισμένη'}</span><span class="tag">${Number(l.guests)||1} άτομα</span></div>
 ${l.notes?`<p class="desc">${esc(l.notes)}</p>`:''}
-<div class="lead-actions"><button class="btn" data-email="${esc(l.id)}">Email draft</button><button class="btn edit-action" type="button" data-edit="${esc(l.id)}" aria-label="Επεξεργασία αιτήματος ${esc(l.name)}">✎ Επεξεργασία</button><button class="btn" data-status="${esc(l.id)}">Αλλαγή status</button><button class="btn danger" data-delete="${esc(l.id)}">Διαγραφή</button></div></article>`
+<div class="lead-actions"><button class="btn" data-email="${esc(l.id)}">Email draft</button>${currentRole?`<button class="btn edit-action" type="button" data-edit="${esc(l.id)}" aria-label="Επεξεργασία αιτήματος ${esc(l.name)}">✎ Επεξεργασία</button><button class="btn" data-status="${esc(l.id)}">Αλλαγή status</button>`:''}${canDeleteLeads()?`<button class="btn danger" data-delete="${esc(l.id)}">Διαγραφή</button>`:''}</div></article>`
 }
 function render(){
 $('stat-total').textContent=leads.length;
@@ -475,7 +519,7 @@ $('email-lead').innerHTML=leads.map(l=>`<option value="${esc(l.id)}">${esc(l.nam
 if(leads.some(l=>l.id===current))$('email-lead').value=current;
 }
 function showPage(name){
-const titles={dashboard:['Επισκόπηση εσόδων','Μια καθαρή εικόνα των αιτημάτων κρατήσεων.'],leads:['Αιτήματα κρατήσεων','Οργάνωσε τα αιτήματα και τις επόμενες ενέργειες.'],email:['Βοηθός email','Δημιούργησε ένα προσχέδιο και έλεγξέ το πριν σταλεί.'],reports:['Αναφορές & δεδομένα','Εξαγωγή, δοκιμαστικά δεδομένα και πληροφορίες demo.']};
+const titles={dashboard:['Επισκόπηση εσόδων','Μια καθαρή εικόνα των αιτημάτων κρατήσεων.'],leads:['Αιτήματα κρατήσεων','Οργάνωσε τα αιτήματα και τις επόμενες ενέργειες.'],email:['Βοηθός email','Δημιούργησε ένα προσχέδιο και έλεγξέ το πριν σταλεί.'],reports:['Αναφορές & δεδομένα','Εξαγωγή, δοκιμαστικά δεδομένα και πληροφορίες demo.'],team:['Ομάδα ξενοδοχείου','Διαχείριση πρόσβασης και ρόλων.']};
 if(!titles[name]) return;
 document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='page-'+name));
 document.querySelectorAll('.nav').forEach(n=>{
@@ -535,24 +579,34 @@ e.preventDefault();
 const data={name:$('f-name').value.trim(),email:$('f-email').value.trim(),
 date:$('f-date').value,guests:Number($('f-guests').value)||1,value:Number($('f-value').value)||0,
 status:$('f-status').value,notes:$('f-notes').value.trim()};
-if(editingLeadId){
-const index=leads.findIndex(l=>l.id===editingLeadId);
-if(index===-1){alert('Το αίτημα δεν βρέθηκε. Άνοιξε ξανά τη λίστα και δοκίμασε πάλι.');closeModal();return}
-leads[index]={...leads[index],...data};
-}else{
-leads.push({id:uid(),...data,created:Date.now()});
-}
-const ok=await save();if(ok){closeModal();showPage('leads');}
+try{
+ let saved;
+ if(editingLeadId){
+  const existing=leads.find(l=>l.id===editingLeadId);
+  if(!existing){alert('Το αίτημα δεν βρέθηκε.');closeModal();return;}
+  saved=await persistLead({...existing,...data},false);
+  leads=leads.map(l=>l.id===saved.id?saved:l);
+ }else{
+  saved=await persistLead({...data,created:Date.now()},true);
+  leads.unshift(saved);
+ }
+ showStorageWarning(false);render();closeModal();showPage('leads');
+}catch(err){console.error(err);alert('Δεν αποθηκεύτηκε: '+(err.message||'Έλεγξε τα δικαιώματα χρήστη.'));}
 });
 $('search').addEventListener('input',render);$('filter').addEventListener('change',render);
 document.addEventListener('click',async e=>{
 const email=e.target.closest('[data-email]');if(email){setEmailLead(email.dataset.email);return}
-const edit=e.target.closest('[data-edit]');if(edit){openEditModal(edit.dataset.edit);return}
-const status=e.target.closest('[data-status]');if(status){
+const edit=e.target.closest('[data-edit]');if(edit){if(currentRole)openEditModal(edit.dataset.edit);return}
+const status=e.target.closest('[data-status]');if(status&&currentRole){
 const l=leads.find(x=>x.id===status.dataset.status);if(!l)return;
-const choices=['open','confirmed','lost'];l.status=choices[(choices.indexOf(l.status)+1)%choices.length];await save();return}
-const del=e.target.closest('[data-delete]');if(del&&confirm('Να διαγραφεί αυτό το αίτημα;')){
-leads=leads.filter(l=>l.id!==del.dataset.delete);await save()}
+const choices=['open','confirmed','lost'];const updated={...l,status:choices[(choices.indexOf(l.status)+1)%choices.length]};
+try{const saved=await persistLead(updated,false);leads=leads.map(x=>x.id===saved.id?saved:x);render();}catch(err){alert('Δεν ενημερώθηκε: '+err.message);}return}
+const del=e.target.closest('[data-delete]');if(del&&canDeleteLeads()&&confirm('Να διαγραφεί αυτό το αίτημα;')){
+try{await deleteLead(del.dataset.delete);leads=leads.filter(l=>l.id!==del.dataset.delete);render();}catch(err){alert('Δεν διαγράφηκε: '+err.message);}}
+const removeMember=e.target.closest('[data-remove-member]');if(removeMember&&canManageMembers()&&confirm('Να αφαιρεθεί αυτό το μέλος από το ξενοδοχείο;')){
+ const member=hotelMembers.find(m=>m.id===removeMember.dataset.removeMember);
+ if(member&&member.role!=='owner'){const {error}=await supabaseClient.from('hotel_members').delete().eq('id',member.id);if(error)alert('Δεν αφαιρέθηκε: '+error.message);else await loadTeam();}
+}
 });
 $('generate-email').onclick=generateEmail;
 $('email-language').onchange=generateEmail;
@@ -572,8 +626,16 @@ const body=$('email-body').textContent.trim();
 const params=new URLSearchParams({to:l.email||'',su:subject,body:body,tf:'cm'});
 window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener');
 };
-$('load-demo').onclick=async()=>{if(!confirm('Να προστεθούν δοκιμαστικά αιτήματα;'))return;leads=leads.concat(demoData());await save()};
-$('delete-all').onclick=async()=>{if(confirm('Να διαγραφούν όλα τα αποθηκευμένα αιτήματα;')){leads=[];await save()}};
+$('load-demo').onclick=async()=>{if(!confirm('Να προστεθούν δοκιμαστικά αιτήματα;'))return;try{for(const d of demoData()){const saved=await persistLead(d,true);leads.push(saved);}render();}catch(err){alert('Δεν φορτώθηκαν όλα τα demo αιτήματα: '+err.message);}};
+$('delete-all').onclick=async()=>{if(!canDeleteLeads())return alert('Δεν έχεις δικαίωμα διαγραφής.');if(confirm('Να διαγραφούν όλα τα αποθηκευμένα αιτήματα;')){try{for(const l of [...leads])await deleteLead(l.id);leads=[];render();}catch(err){alert('Η διαγραφή σταμάτησε: '+err.message);}}};
+$('team-add-form').addEventListener('submit',async e=>{
+ e.preventDefault();if(!canManageMembers())return;
+ const userId=$('team-user-id').value.trim(),role=$('team-role').value;
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)){alert('Το User ID πρέπει να είναι έγκυρο UUID.');return;}
+ const {error}=await supabaseClient.from('hotel_members').insert({hotel_id:activeHotelId,user_id:userId,role});
+ if(error){alert('Δεν προστέθηκε το μέλος: '+error.message);return;}
+ $('team-add-form').reset();await loadTeam();alert('Το μέλος προστέθηκε.');
+});
 $('export-json').onclick=()=>download('client-rescue-leads.json',JSON.stringify(leads,null,2),'application/json');
 $('export-csv').onclick=()=>{
 const cols=['name','email','date','guests','value','status','notes'];
@@ -644,7 +706,7 @@ download('client-rescue-leads.csv','\ufeff'+csv,'text/csv;charset=utf-8');
   });
 })();
 
-render();
+applyRoleUI();
 refreshAuth();
 </script>
 </body>
