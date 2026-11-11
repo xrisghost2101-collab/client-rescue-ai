@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0b">
+<meta name="description" content="Client Rescue AI — ξεκάθαρη και εύχρηστη διαχείριση αιτημάτων ξενοδοχείου.">
+<title>Client Rescue AI | Hotel Revenue Desk</title>
+<style>
+:root {
+  --bg:#0b0c0b; --panel:#131513; --panel2:#191b18;
+  --line:#292b26; --gold:#d8b574; --gold2:#f0d7a2;
+  --text:#f4f1e9; --muted:#a4a69d; --green:#9bd5ad;
+  --red:#e9a5a0; --radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:14px/1.5 Inter,system-ui,-apple-system,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);padding:25px 17px;background:#0e0f0e}
+.brand{display:flex;align-items:center;gap:11px;margin:0 0 36px}
+.logo{width:39px;height:39px;border:1px solid #796542;border-radius:13px;
+display:grid;place-items:center;color:var(--gold);font-weight:800;font-size:19px}
+.brand strong{display:block;letter-spacing:.08em;font-size:12px}
+.brand small{color:var(--muted);font-size:10px;letter-spacing:.13em}
+.nav-label{color:#74776e;font-size:10px;letter-spacing:.15em;margin:22px 10px 8px}
+.nav{display:flex;gap:11px;align-items:center;padding:11px 12px;border-radius:11px;
+color:#b9bbb2;margin:4px 0;cursor:pointer}
+.nav.active,.nav:hover{background:#22231e;color:var(--gold2)}
+.nav .ico{width:19px;text-align:center}
+.sidebar-note{margin-top:35px;padding:14px;border:1px solid var(--line);
+border-radius:14px;color:var(--muted);font-size:12px}
+.sidebar-note b{display:block;color:var(--gold);margin-bottom:5px}
+.main{min-width:0;padding:25px clamp(15px,3vw,38px) 45px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;
+border-bottom:1px solid var(--line);padding-bottom:21px;margin-bottom:27px}
+.eyebrow{color:var(--gold);font-size:10px;letter-spacing:.17em;text-transform:uppercase}
+h1{font-size:clamp(24px,3vw,34px);line-height:1.15;letter-spacing:-.04em;margin:6px 0}
+.subtitle{color:var(--muted);margin:7px 0 0;font-size:13px}
+.top-actions{display:flex;align-items:center;gap:9px}
+.pill{border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:var(--muted);
+font-size:11px;white-space:nowrap}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);
+border-radius:11px;padding:10px 13px;font-weight:600;font-size:12px}
+.btn:hover{border-color:#8d754a}
+.btn.gold{background:var(--gold);color:#18150f;border-color:var(--gold)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:23px}
+.stat,.panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.stat{padding:17px}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.stat-icon{color:var(--gold);font-size:17px}
+.stat-number{font-size:clamp(24px,3vw,33px);font-weight:650;letter-spacing:-.04em;margin:13px 0 4px}
+.stat-foot{font-size:11px;color:var(--muted)}
+.gold-text{color:var(--gold)}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,.85fr);gap:17px}
+.panel{padding:19px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.panel h2{font-size:15px;margin:0;letter-spacing:-.02em}
+.panel p.desc{font-size:12px;color:var(--muted);margin:5px 0 0}
+.toolbar{display:flex;gap:8px;margin-bottom:13px}
+.field{width:100%;min-width:0;background:#0d0e0d;border:1px solid var(--line);
+border-radius:10px;padding:10px 11px;color:var(--text);outline:none}
+.field:focus{border-color:#9e8556}
+select.field{width:auto}
+.lead-list{display:flex;flex-direction:column;gap:9px}
+.lead{padding:13px;border:1px solid var(--line);border-radius:13px;background:#101210}
+.lead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.lead-name{font-weight:650;font-size:13px}
+.lead-email{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.lead-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.tag{display:inline-block;padding:4px 8px;border-radius:7px;background:#25261f;color:#d5d1c4;font-size:10px}
+.tag.open{color:var(--gold2);background:#322a1b}
+.tag.confirmed{color:var(--green);background:#18281d}
+.tag.lost{color:var(--red);background:#2b1d1c}
+.lead-actions{display:flex;flex-wrap:wrap;gap:6px}
+.lead-actions .btn{padding:7px 9px;font-size:11px}
+.lead-actions .btn.edit-action{border-color:#8d754a;color:var(--gold2);background:#252117}
+.lead-actions .btn.edit-action:hover{background:#332b1d;border-color:var(--gold)}
+.money{font-weight:650;color:var(--gold2);white-space:nowrap}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.side-stack{display:flex;flex-direction:column;gap:17px}
+.rescue-box{background:linear-gradient(145deg,#252219,#151613);border-color:#57482e}
+.rescue-box .big{font-size:24px;color:var(--gold2);font-weight:650;margin:12px 0 4px}
+.rescue-box .desc{color:#c0b9a8}
+.rescue-box .btn{margin-top:13px}
+.steps{display:flex;flex-direction:column;gap:13px}
+.step{display:flex;gap:10px;align-items:flex-start}
+.step-n{width:26px;height:26px;border:1px solid #665538;color:var(--gold);
+border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:11px}
+.step b{display:block;font-size:12px;margin-bottom:2px}
+.step span{display:block;color:var(--muted);font-size:11px}
+.section{display:none}
+.section.active{display:block}
+.notice{margin:0 0 20px;padding:13px 15px;border:1px solid #4e432d;background:#211d15;border-radius:12px;
+padding:12px 14px;color:#d5c9ae;font-size:12px;margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;color:var(--muted)}
+.form-group.full{grid-column:1/-1}
+textarea.field{min-height:90px;resize:vertical}
+.modal-back{position:fixed;inset:0;background:#000b;display:none;align-items:center;
+justify-content:center;padding:16px;z-index:10}
+.modal-back.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+padding:21px;width:min(520px,100%);max-height:90vh;overflow:auto}
+.modal h2{font-size:19px;margin:0 0 5px}
+.modal .subtitle{margin-bottom:18px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+.email-output{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c0d0c;
+border:1px solid var(--line);padding:15px;border-radius:12px;min-height:170px;
+font-size:12px;color:#e9e5dc}
+.footer{color:#6f726a;font-size:10px;text-align:center;margin-top:25px}
+.mobile-menu{display:none}
+@media(max-width:950px){
+ .app{grid-template-columns:1fr}
+ .sidebar{position:sticky;top:0;z-index:5;border-right:0;border-bottom:1px solid var(--line);
+ padding:10px 13px;display:flex;align-items:center;gap:12px;overflow-x:auto}
+ .brand{margin:0 12px 0 0;flex-shrink:0}.brand small{display:none}
+ .brand .logo{width:34px;height:34px}
+ .nav-label,.sidebar-note{display:none}
+ .nav{padding:9px 11px;margin:0;white-space:nowrap;font-size:12px}
+ .main{padding-top:19px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .layout{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+ .topbar{align-items:flex-start}
+ .top-actions{flex-direction:column;align-items:flex-end}
+ .pill{display:none}
+ .panel{padding:14px}
+ .stat{padding:13px}
+ .stat-top{font-size:11px}
+ .toolbar{flex-direction:column}
+ .toolbar select.field{width:100%}
+ .form-grid{grid-template-columns:1fr}
+ .form-group.full{grid-column:auto}
+}
+
+/* Πρόσθετη premium και φιλική εμπειρία — διατηρεί την αρχική dark/gold παλέτα και τα 4 στατιστικά πλαίσια */
+.welcome-panel {
+  display:grid; grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
+  gap:24px; align-items:center; margin:0 0 22px; padding:clamp(20px,3vw,30px);
+  border:1px solid #57482e; border-radius:20px;
+  background:linear-gradient(135deg,#201e18 0%,#131513 100%);
+  box-shadow:0 10px 30px #0003;
+}
+.welcome-copy h2 { margin:5px 0 10px; color:var(--gold2); font-size:clamp(25px,2.5vw,32px); line-height:1.2; }
+.welcome-copy p { max-width:60ch; margin:0; color:#d1cec4; font-size:18px; line-height:1.65; }
+.welcome-actions { display:grid; gap:12px; }
+.primary-task { width:100%; min-height:58px; text-align:left; padding:16px 18px; font-size:16px; }
+.quick-help { margin:0 0 22px; padding:23px; border:1px solid #57482e; border-radius:18px; background:#151713; box-shadow:0 8px 25px #0003; }
+.quick-help[hidden] { display:none !important; }
+.quick-help-head { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:10px; }
+.quick-help h2 { margin:4px 0; color:var(--gold2); font-size:23px; }
+.help-steps { display:grid; gap:14px; margin:16px 0; padding-left:28px; }
+.help-steps li { padding-left:4px; color:var(--text); font-size:17px; }
+.help-steps li strong,.help-steps li span { display:block; }
+.help-steps li span { margin-top:4px; color:#c5c5bc; font-size:15px; line-height:1.65; }
+.help-note { margin:0; padding:13px 15px; border:1px solid #57482e; border-radius:11px; background:#211d15; color:#e4d5b7; font-size:15px; line-height:1.6; }
+#help-toggle[aria-expanded="true"] { border-color:var(--gold); color:var(--gold2); }
+.btn { min-height:42px; font-size:14px; }
+.field { min-height:46px; font-size:16px; }
+.form-group label { font-size:14px; line-height:1.5; }
+.nav { min-height:46px; font-size:14px; }
+.nav.active { box-shadow:inset 3px 0 var(--gold); }
+.lead-name { font-size:15px; }
+.lead-email { font-size:13px; }
+.tag { font-size:12px; }
+.lead-actions .btn { min-height:40px; font-size:13px; padding:9px 11px; }
+.lead-actions .btn.edit-action { font-weight:750; }
+.btn:focus-visible, .field:focus-visible, .nav:focus-visible {
+  outline:3px solid var(--gold2); outline-offset:3px;
+}
+.btn:active { transform:translateY(1px); }
+@media (max-width:760px) {
+  .welcome-panel { grid-template-columns:1fr; gap:18px; padding:19px; }
+  .welcome-copy p { font-size:17px; }
+  .quick-help { padding:17px; }
+  .quick-help-head { align-items:flex-start; flex-direction:column; }
+  .topbar { flex-wrap:wrap; }
+  .top-actions { flex-wrap:wrap; align-items:flex-start; }
+  .top-actions .btn { min-height:44px; }
+}
+@media (min-width:501px) {
+  body.large-text { font-size:18px; }
+  body.large-text .subtitle, body.large-text .panel p.desc, body.large-text .stat-top,
+  body.large-text .stat-foot, body.large-text .form-group label, body.large-text .lead-email { font-size:16px; }
+  body.large-text .btn, body.large-text .nav, body.large-text .lead-name { font-size:17px; }
+  body.large-text .field { font-size:18px; min-height:52px; }
+  body.large-text .welcome-copy p, body.large-text .help-steps li { font-size:20px; }
+  body.large-text .help-steps li span, body.large-text .help-note { font-size:18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+}
+
+
+.auth-gate{position:fixed;inset:0;z-index:1000;background:rgba(5,6,5,.96);display:grid;place-items:center;padding:20px}
+.auth-card{width:min(440px,100%);background:#131513;border:1px solid #57482e;border-radius:20px;padding:26px;box-shadow:0 25px 80px #0009}
+.auth-card h2{margin:0 0 8px;color:var(--gold2)}.auth-card p{color:var(--muted);font-size:13px}
+.auth-card label{display:block;margin:13px 0 6px;color:#d5d1c4;font-size:12px}
+.auth-card .field{margin-bottom:4px}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.auth-message{min-height:20px;color:var(--gold2);font-size:12px;margin-top:12px}
+#cloud-user{max-width:180px;overflow:hidden;text-overflow:ellipsis}
+
+
+.chat-log{display:flex;flex-direction:column;gap:10px;min-height:210px;max-height:390px;overflow:auto;padding:15px;background:#0d0f0d;border:1px solid var(--line);border-radius:14px;margin-top:15px}
+.chat-bubble{max-width:min(82%,680px);padding:11px 14px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-bubble.assistant{align-self:flex-start;background:#1b201b;border:1px solid #3a3d32;color:var(--text)}
+.chat-bubble.guest{align-self:flex-end;background:#3a3020;border:1px solid #796542;color:#fff4dc}
+.chat-handoff{align-self:flex-start;color:var(--gold2);font-size:12px;padding:0 8px}
+.chat-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:12px;align-items:end}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:650px){.chat-form{grid-template-columns:1fr}.chat-bubble{max-width:95%}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">CR</div><div><strong>CLIENT RESCUE</strong><small>HOTEL REVENUE DESK</small></div></div>
+  <div class="nav active" data-page="dashboard" role="button" tabindex="0" aria-current="page"><span class="ico">◫</span> Αρχική εικόνα</div>
+  <div class="nav" data-page="leads" role="button" tabindex="0"><span class="ico">◎</span> Αιτήματα κρατήσεων</div>
+  <div class="nav" data-page="email" role="button" tabindex="0"><span class="ico">✉</span> Βοηθός email</div>
+  <div class="nav" data-page="ai" role="button" tabindex="0"><span class="ico">✧</span> AI Revenue Desk</div>
+  <div class="nav" data-page="receptionist" role="button" tabindex="0"><span class="ico">◉</span> AI Receptionist</div>
+  <div class="nav" data-page="reports" role="button" tabindex="0"><span class="ico">↗</span> Αναφορές & δεδομένα</div>
+</aside>
+<main class="main">
+<header class="topbar">
+ <div><div class="eyebrow">Hospitality · Revenue operations</div><h1 id="page-title">Επισκόπηση εσόδων</h1>
+ <p class="subtitle" id="page-subtitle">Μια καθαρή εικόνα των αιτημάτων κρατήσεων.</p></div>
+ <div class="top-actions"><span class="pill" id="cloud-user">CLOUD WORKSPACE</span><select class="btn" id="hotel-switcher" aria-label="Επιλογή ξενοδοχείου" hidden></select><button class="btn" id="sign-out" type="button">Αποσύνδεση</button><button class="btn" id="readability-toggle" type="button" aria-pressed="false">ΑΑ Μεγαλύτερα γράμματα</button><button class="btn" id="help-toggle" type="button" aria-expanded="false" aria-controls="quick-help">Βοήθεια</button><button class="btn gold" id="new-lead-top">+ Νέο αίτημα</button></div>
+</header>
+
+
+ <div id="storage-warning" class="notice" role="status" hidden>Δεν υπάρχει σύνδεση με την online βάση. Οι αλλαγές δεν έχουν αποθηκευτεί.</div>
+ <section class="welcome-panel" aria-labelledby="welcome-title">
+  <div class="welcome-copy"><div class="eyebrow">ΚΑΛΩΣ ΗΡΘΕΣ ΣΤΟ WORKSPACE</div><h2 id="welcome-title">Οργάνωσε κάθε αίτημα. Μην αφήνεις ευκαιρίες να χάνονται.</h2><p>Καταχώρισε τα αιτήματα κρατήσεων, ετοίμασε προσεγμένες απαντήσεις και παρακολούθησε την κατάστασή τους από ένα σημείο.</p></div>
+  <div class="welcome-actions"><button class="btn gold primary-task" id="welcome-new-lead" type="button">＋ Καταχώριση νέου αιτήματος</button><button class="btn primary-task" id="welcome-open-leads" type="button">◎ Προβολή όλων των αιτημάτων</button></div>
+ </section>
+ <section class="quick-help" id="quick-help" tabindex="-1" aria-labelledby="help-title" hidden>
+  <div class="quick-help-head"><div><div class="eyebrow">ΓΡΗΓΟΡΗ ΕΚΚΙΝΗΣΗ</div><h2 id="help-title">Πώς να χρησιμοποιήσεις το Client Rescue</h2></div><button class="btn" id="help-close" type="button">Κλείσιμο βοήθειας</button></div>
+  <ol class="help-steps"><li><strong>Καταχώρισε το αίτημα</strong><span>Συμπλήρωσε όνομα, email, ημερομηνία, άτομα και εκτιμώμενη αξία.</span></li><li><strong>Έλεγξε και ετοίμασε την απάντηση</strong><span>Διάλεξε το αίτημα στον Βοηθό email και έλεγξε κάθε πληροφορία πριν τη χρησιμοποιήσεις.</span></li><li><strong>Ενημέρωσε την κατάστασή του</strong><span>Στα αιτήματα, άλλαξε κατάσταση και χρησιμοποίησε τα φίλτρα για να βρεις ό,τι χρειάζεται ενέργεια.</span></li><li><strong>Κράτησε αντίγραφο</strong><span>Από τις αναφορές μπορείς να εξαγάγεις τα δεδομένα σε CSV ή JSON.</span></li></ol>
+  <p class="help-note">Σημαντικό: η εφαρμογή αποθηκεύει αιτήματα μέσω Supabase και χρησιμοποιεί AI μέσω Edge Function. Δεν συνδέεται ακόμη με πραγματικό inbox ή σύστημα κρατήσεων. Τα AI αποτελέσματα και τα email πρέπει να ελέγχονται πριν από τη χρήση.</p>
+ </section>
+
+<section class="section active" id="page-dashboard">
+ <div class="notice">CLOUD WORKSPACE · Τα αιτήματα αποθηκεύονται στο ενεργό ξενοδοχείο. Δεν συνδέεται ακόμη με πραγματικό inbox ή PMS.</div>
+ <div class="stats">
+  <div class="stat"><div class="stat-top">Σύνολο αιτημάτων <span class="stat-icon">◎</span></div><div class="stat-number" id="stat-total">0</div><div class="stat-foot">Καταχωρισμένα αιτήματα</div></div>
+  <div class="stat"><div class="stat-top">Εκκρεμή <span class="stat-icon">◷</span></div><div class="stat-number" id="stat-open">0</div><div class="stat-foot">Χρειάζονται ενέργεια</div></div>
+  <div class="stat"><div class="stat-top">Επιβεβαιωμένα <span class="stat-icon">✓</span></div><div class="stat-number" id="stat-confirmed">0</div><div class="stat-foot">Έχουν επιβεβαιωθεί</div></div>
+  <div class="stat"><div class="stat-top">Συνολική καταγεγραμμένη αξία <span class="stat-icon">€</span></div><div class="stat-number" id="stat-value">€0</div><div class="stat-foot">Άθροισμα αξιών όλων των αιτημάτων, όχι κέρδος</div></div>
+ </div>
+ <div class="stats" aria-label="Δείκτες εσόδων">
+  <div class="stat"><div class="stat-top">Pipeline εκκρεμών <span class="stat-icon">€</span></div><div class="stat-number" id="stat-open-value">€0</div><div class="stat-foot">Εκτιμώμενη αξία ανοιχτών αιτημάτων</div></div>
+  <div class="stat"><div class="stat-top">Επιβεβαιωμένη αξία <span class="stat-icon">✓</span></div><div class="stat-number" id="stat-confirmed-value">€0</div><div class="stat-foot">Αξία επιβεβαιωμένων αιτημάτων</div></div>
+  <div class="stat"><div class="stat-top">Ποσοστό επιβεβαίωσης <span class="stat-icon">%</span></div><div class="stat-number" id="stat-conversion">0%</div><div class="stat-foot">Επιβεβαιωμένα / όλα τα αιτήματα</div></div>
+  <div class="stat"><div class="stat-top">Χαμένα αιτήματα <span class="stat-icon">↘</span></div><div class="stat-number" id="stat-lost">0</div><div class="stat-foot">Χρειάζονται αξιολόγηση αιτιών</div></div>
+ </div>
+ <div class="layout">
+  <div class="panel">
+   <div class="panel-head"><div><h2>Πρόσφατα αιτήματα</h2><p class="desc">Ενέργειες που μπορείτε να κάνετε τώρα</p></div><button class="btn ghost" data-goto="leads">Όλα →</button></div>
+   <div class="lead-list" id="recent-list"></div>
+  </div>
+  <div class="side-stack">
+   <div class="panel rescue-box"><div class="eyebrow">ΕΥΚΑΙΡΙΕΣ ΕΞΥΠΗΡΕΤΗΣΗΣ</div><h2>Μην αφήνεις ένα αίτημα αναπάντητο.</h2><div class="big" id="rescue-count">0 ανοιχτά</div><p class="desc">Ετοίμασε μια επαγγελματική απάντηση και συνέχισε τη διαδικασία από το email σου.</p><button class="btn gold" data-goto="leads">Προβολή αιτημάτων →</button></div>
+   <div class="panel"><div class="panel-head"><div><h2>Προτεινόμενη ροή</h2><p class="desc">Απλό workflow για μικρά ξενοδοχεία</p></div></div>
+    <div class="steps">
+     <div class="step"><div class="step-n">01</div><div><b>Καταχώρισε το αίτημα</b><span>Πέρασε τα στοιχεία που έλαβες.</span></div></div>
+     <div class="step"><div class="step-n">02</div><div><b>Ετοίμασε την απάντηση</b><span>Χρησιμοποίησε πρότυπο και έλεγξε τα στοιχεία.</span></div></div>
+     <div class="step"><div class="step-n">03</div><div><b>Στείλε και ενημέρωσε</b><span>Άνοιξε το email app και άλλαξε την κατάσταση χειροκίνητα.</span></div></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-leads">
+ <div class="notice">Τα αιτήματα αποθηκεύονται online στο ενεργό ξενοδοχείο μέσω Supabase.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Αιτήματα κρατήσεων</h2><p class="desc">Διαχείριση αιτημάτων και κατάστασης</p></div><button class="btn gold" id="new-lead">+ Προσθήκη</button></div>
+  <div class="toolbar"><input id="search" class="field" placeholder="Αναζήτηση ονόματος ή email...">
+  <select id="filter" class="field"><option value="all">Όλες οι καταστάσεις</option><option value="open">Εκκρεμή</option><option value="confirmed">Επιβεβαιωμένα</option><option value="lost">Χαμένα</option></select></div>
+  <div class="lead-list" id="all-list"></div>
+ </div>
+</section>
+
+<section class="section" id="page-email">
+ <div class="notice">Δημιούργησε προσχέδια email με πρότυπο ή με το AI Revenue Desk. Δεν γίνεται αυτόματη αποστολή email.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Βοηθός email</h2><p class="desc">Σύνταξη απάντησης με ανθρώπινο έλεγχο</p></div></div>
+  <div class="form-grid">
+   <div class="form-group"><label>Αίτημα πελάτη</label><select class="field" id="email-lead"></select></div>
+   <div class="form-group"><label>Γλώσσα</label><select class="field" id="email-language"><option value="el">Ελληνικά</option><option value="en">English</option></select></div>
+   <div class="form-group"><label>Όνομα ξενοδοχείου</label><input class="field" id="hotel-name" placeholder="π.χ. Aegean House"></div>
+   <div class="form-group"><label>Τηλέφωνο / στοιχεία επικοινωνίας (προαιρετικά)</label><input class="field" id="hotel-contact" placeholder="Τηλέφωνο ή site"></div>
+   <div class="form-group full"><label>Πληροφορίες που έχουν επιβεβαιωθεί (προαιρετικά)</label><textarea class="field" id="verified-info" placeholder="π.χ. Θα σας απαντήσουμε για διαθεσιμότητα εντός της ημέρας. Μην εισάγεις στοιχεία που δεν έχεις επιβεβαιώσει."></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:15px 0"><button class="btn gold" id="generate-email">Δημιουργία προσχεδίου</button><button class="btn" id="clear-email">Καθαρισμός</button></div>
+  <div class="form-group"><label>Θέμα email</label><input id="email-subject" class="field"></div>
+  <div class="form-group" style="margin-top:12px"><label>Κείμενο email</label><div id="email-body" class="email-output">Επίλεξε αίτημα και πάτησε «Δημιουργία προσχεδίου».</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn" id="copy-email">Αντιγραφή κειμένου</button><button class="btn gold" id="open-mail">Άνοιγμα email app</button></div>
+ </div>
+</section>
+
+<section class="section" id="page-ai">
+ <div class="notice">AI REVENUE DESK · Το AI αναλύει το επιλεγμένο αίτημα και τα συγκεντρωτικά στοιχεία του ενεργού ξενοδοχείου. Έλεγξε κάθε πρόταση πριν τη χρησιμοποιήσεις.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>AI Revenue Desk</h2><p class="desc">Ανάλυση αιτημάτων, ανάκτηση χαμένων εσόδων και έξυπνες απαντήσεις.</p></div><span class="tag confirmed">GroqCloud · GPT-OSS 120B</span></div>
+  <div class="form-grid">
+   <div class="form-group"><label>Αίτημα προς ανάλυση</label><select class="field" id="ai-lead"></select></div>
+   <div class="form-group"><label>Ξενοδοχείο</label><input class="field" id="ai-hotel-name" readonly placeholder="Από το ενεργό ξενοδοχείο"></div>
+   <div class="form-group full"><label>Επιβεβαιωμένες πληροφορίες ξενοδοχείου</label><textarea class="field" id="ai-verified-info" rows="3" placeholder="Πρόσθεσε μόνο επιβεβαιωμένες πληροφορίες, π.χ. παροχές, πολιτική ακύρωσης ή προσφορά."></textarea></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+   <button class="btn gold" type="button" data-ai-action="analyze_request">Ανάλυση αιτήματος</button>
+   <button class="btn" type="button" data-ai-action="revenue_recovery">Ανάκτηση εσόδου</button>
+   <button class="btn" type="button" data-ai-action="draft_email">Σύνταξη AI email</button>
+   <button class="btn" type="button" data-ai-action="revenue_intelligence">Συνολική ανάλυση εσόδων</button>
+  </div>
+  <div id="ai-status" class="notice" role="status" style="margin-top:15px" hidden></div>
+  <div class="form-group" style="margin-top:14px"><label>Αποτέλεσμα AI</label><div id="ai-result" class="email-output" aria-live="polite">Επίλεξε λειτουργία για να ξεκινήσει η ανάλυση.</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn" id="ai-copy-result" type="button">Αντιγραφή αποτελέσματος</button><button class="btn gold" id="ai-use-email" type="button" disabled>Χρήση στο προσχέδιο email</button></div>
+  <p class="desc" style="margin-top:13px">Ασφάλεια: το Groq API key παραμένει στο Supabase και δεν ενσωματώνεται στο HTML. Το AI δεν επιβεβαιώνει διαθεσιμότητα ή τιμές και δεν στέλνει email αυτόματα. Απαιτείται ανθρώπινος έλεγχος.</p>
+ </div>
+</section>
+
+<section class="section" id="page-receptionist">
+ <div class="notice">AI RECEPTIONIST · Απαντά μόνο με βάση τις πληροφορίες που δίνει το ξενοδοχείο. Όταν δεν γνωρίζει κάτι, παραπέμπει σε άνθρωπο.</div>
+ <div class="panel">
+  <div class="panel-head"><div><h2>Guest Conversation</h2><p class="desc">Δοκιμαστική συνομιλία επισκέπτη με τον ψηφιακό receptionist.</p></div><span class="tag confirmed">AI · Human handoff</span></div>
+  <div class="form-group"><label for="receptionist-facts">Επιβεβαιωμένες πληροφορίες ξενοδοχείου</label><textarea class="field" id="receptionist-facts" rows="4" maxlength="1500" placeholder="Γράψε μόνο επιβεβαιωμένα στοιχεία: παροχές, ώρες πρωινού, πολιτική, στοιχεία επικοινωνίας κ.λπ."></textarea><p class="desc">Μην προσθέτεις τιμές ή διαθεσιμότητα αν δεν είναι επιβεβαιωμένες.</p></div>
+  <div class="desc" style="margin:8px 0 12px">Δοκίμασε: «Τι ώρα σερβίρεται το πρωινό;» ή «Μπορείτε να επιβεβαιώσετε διαθεσιμότητα;»</div>
+  <div id="receptionist-log" class="chat-log" role="log" aria-live="polite" aria-label="Συνομιλία με AI Receptionist"><div class="chat-bubble assistant">Καλησπέρα σας! Είμαι ο ψηφιακός βοηθός του ξενοδοχείου. Πώς μπορώ να σας βοηθήσω;</div></div>
+  <form id="receptionist-form" class="chat-form"><label class="sr-only" for="receptionist-input">Μήνυμα επισκέπτη</label><textarea id="receptionist-input" class="field" rows="2" maxlength="1200" placeholder="Γράψε το μήνυμα του επισκέπτη…" required></textarea><button class="btn gold" id="receptionist-send" type="submit">Αποστολή</button></form>
+  <div id="receptionist-usage" class="desc" role="status" style="margin-top:8px">Τοπικό όριο χρήσης: έως 5 μηνύματα ανά λεπτό ανά ανοιχτή καρτέλα. Δεν αντικαθιστά server-side προστασία.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" id="receptionist-clear" type="button">Νέα συνομιλία</button><span class="desc">Η συνομιλία μένει προσωρινά στη μνήμη της σελίδας και δεν αποθηκεύεται στη βάση. Μην εισάγεις στοιχεία πληρωμής ή ευαίσθητα προσωπικά δεδομένα.</span></div>
+ </div>
+</section>
+
+<section class="section" id="page-reports">
+ <div class="notice">Εξήγαγε μόνο δοκιμαστικά ή κατάλληλα προστατευμένα δεδομένα. Για πραγματικά στοιχεία πελατών απαιτούνται μέτρα ασφάλειας και συμμόρφωση με τον GDPR.</div>
+ <div class="layout">
+  <div class="panel"><h2>Εξαγωγή δεδομένων</h2><p class="desc">Κατέβασε αντίγραφο των αιτημάτων.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="btn gold" id="export-csv">Εξαγωγή CSV</button><button class="btn" id="export-json">Εξαγωγή JSON</button></div>
+  </div>
+  <div class="panel"><h2>Demo data</h2><p class="desc">Φόρτωσε δοκιμαστικά αιτήματα ή καθάρισε το workspace.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px"><button class="btn" id="load-demo">Φόρτωση demo</button><button class="btn danger" id="delete-all">Διαγραφή όλων</button></div>
+  </div>
+ </div>
+ <div class="panel" style="margin-top:17px"><h2>Τι κάνει αυτή η έκδοση</h2><p class="desc">Online καταχώριση αιτημάτων ανά ξενοδοχείο μέσω Supabase, AI ανάλυση μέσω GroqCloud, πρότυπα email, αλλαγή κατάστασης, αναζήτηση και εξαγωγή.</p>
+ <p class="desc">Τι δεν κάνει ακόμη: αυτόματη ανάγνωση inbox, αποστολή email από server, real-time διαθεσιμότητα ή σύνδεση PMS/CRM.</p></div>
+</section>
+<div class="footer">CLIENT RESCUE AI · SUPABASE CLOUD BUILD · AUTHENTICATED WORKSPACE</div>
+</main>
+</div>
+
+<div class="auth-gate" id="auth-gate">
+ <div class="auth-card">
+  <div class="eyebrow">CLIENT RESCUE AI · SECURE ACCESS</div>
+  <h2>Σύνδεση στο workspace</h2>
+  <p>Τα αιτήματά σου αποθηκεύονται online και είναι ορατά μόνο στον λογαριασμό σου.</p>
+  <form id="auth-form">
+   <label for="auth-email">Email</label><input class="field" id="auth-email" type="email" autocomplete="email" required maxlength="180">
+   <label for="auth-password">Κωδικός πρόσβασης</label><input class="field" id="auth-password" type="password" autocomplete="current-password" minlength="8" required>
+   <div class="auth-actions"><button class="btn gold" type="submit" id="auth-submit">Σύνδεση</button><button class="btn" type="button" id="auth-signup">Δημιουργία λογαριασμού</button></div>
+  </form>
+  <div class="auth-message" id="auth-message" role="status"></div>
+  <p style="font-size:11px">Χρησιμοποίησε λογαριασμό δοκιμών. Μην καταχωρίζεις πραγματικά προσωπικά δεδομένα πελατών πριν ολοκληρωθεί ο έλεγχος ασφάλειας και GDPR.</p>
+ </div>
+</div>
+<div class="modal-back" id="modal-back">
+ <div class="modal">
+  <h2 id="modal-title">Νέο booking lead</h2><p class="subtitle" id="modal-subtitle">Συμπλήρωσε όσα στοιχεία γνωρίζεις.</p>
+  <form id="lead-form">
+   <div class="form-grid">
+    <div class="form-group"><label>Όνομα πελάτη *</label><input required id="f-name" class="field" maxlength="100"></div>
+    <div class="form-group"><label>Email *</label><input required type="email" id="f-email" class="field" maxlength="180"></div>
+    <div class="form-group"><label>Τηλέφωνο (προαιρετικά)</label><input type="tel" id="f-phone" class="field" maxlength="40" autocomplete="tel"></div>
+    <div class="form-group"><label>Ημερομηνία άφιξης</label><input type="date" id="f-date" class="field"></div>
+    <div class="form-group"><label>Αριθμός ατόμων</label><input type="number" id="f-guests" class="field" min="1" max="30" value="2"></div>
+    <div class="form-group"><label>Εκτιμώμενη αξία (€)</label><input type="number" id="f-value" class="field" min="0" max="10000000" value="0"></div>
+    <div class="form-group"><label>Κατάσταση</label><select id="f-status" class="field"><option value="open">Εκκρεμές</option><option value="confirmed">Επιβεβαιωμένο</option><option value="lost">Χαμένο</option></select></div>
+    <div class="form-group full"><label>Σημειώσεις</label><textarea id="f-notes" class="field" maxlength="1000" placeholder="Μην καταχωρίζεις ευαίσθητα προσωπικά δεδομένα."></textarea></div>
+   </div>
+   <div class="modal-actions"><button type="button" class="btn" id="cancel-modal">Ακύρωση</button><button type="submit" class="btn gold" id="save-lead-button">Αποθήκευση αιτήματος</button></div>
+  </form>
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://rjtpjinusmqgyfeblvsm.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BgLpjLnVwAVmRd-9X2lxiA_tSO9HDGC';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let currentUser = null;
+let activeHotelId = null;
+let hotelMemberships = [];
+let cloudLoadVersion = 0;
+let aiRequestVersion = 0;
+let receptionistRequestVersion = 0;
+const KEY = 'client_rescue_ai_demo_v1';
+const $ = id => document.getElementById(id);
+const money = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number(n)||0);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const statusLabel = s => ({open:'Εκκρεμές',confirmed:'Επιβεβαιωμένο',lost:'Χαμένο'}[s]||s);
+function uid(){return crypto.randomUUID()}
+function showStorageWarning(show=true){
+const notice=$('storage-warning');
+if(notice) notice.hidden=!show;
+}
+function normalizeLead(l){return {
+id:typeof l.id==='string'&&l.id?l.id:uid(),
+name:String(l.name||'').slice(0,100),email:String(l.email||'').slice(0,180),
+phone:typeof l.phone==='string'?l.phone.slice(0,40):'',
+date:typeof l.date==='string'?l.date:'',
+guests:Math.min(30,Math.max(1,Number(l.guests)||1)),
+value:Math.min(10000000,Math.max(0,Number(l.value)||0)),
+status:['open','confirmed','lost'].includes(l.status)?l.status:'open',
+notes:typeof l.notes==='string'?l.notes.slice(0,1000):'',
+hotel_id:l.hotel_id||null
+}}
+let leads = [];
+let editingLeadId = null;
+function clearTenantScopedState(){
+ // Invalidate pending AI responses so data from a previous hotel/session cannot
+ // appear after a hotel switch, membership revocation, or sign-out.
+ aiRequestVersion++;
+ receptionistRequestVersion++;
+ leads=[];
+ $('hotel-name').value='';
+ $('ai-hotel-name').value='';
+ $('hotel-contact').value='';
+ $('verified-info').value='';
+ $('ai-verified-info').value='';
+ $('receptionist-facts').value='';
+ $('email-subject').value='';
+ $('email-body').textContent='Επίλεξε αίτημα και πάτησε «Δημιουργία προσχεδίου».';
+ $('ai-result').textContent='';
+ $('ai-use-email').disabled=true;
+ document.querySelectorAll('[data-ai-action]').forEach(button=>button.disabled=false);
+ lastAIResult=null;
+ setAIStatus('',false);
+ if(typeof resetReceptionistChat==='function') resetReceptionistChat();
+ $('receptionist-send').disabled=false;
+ $('receptionist-input').disabled=false;
+ render();
+}
+async function loadCloud(){
+ if(!currentUser) throw new Error('Δεν υπάρχει συνδεδεμένος χρήστης.');
+ const loadVersion=++cloudLoadVersion;
+ const requestedUserId=currentUser.id;
+ const {data:members,error:memberError}=await supabaseClient
+  .from('hotel_members').select('hotel_id,role,hotels(name)').eq('user_id',currentUser.id);
+ if(memberError) throw memberError;
+ if(loadVersion!==cloudLoadVersion||!currentUser||currentUser.id!==requestedUserId)return;
+ hotelMemberships=members||[];
+ const switcher=$('hotel-switcher');
+ if(!hotelMemberships.length){activeHotelId=null;switcher.hidden=true;clearTenantScopedState();throw new Error('Ο λογαριασμός δεν έχει συνδεθεί ακόμη με ξενοδοχείο. Ζήτησε από τον διαχειριστή να σε προσθέσει.');}
+ if(!hotelMemberships.some(m=>m.hotel_id===activeHotelId)) activeHotelId=hotelMemberships[0].hotel_id;
+ switcher.innerHTML=hotelMemberships.map(m=>`<option value="${esc(m.hotel_id)}">${esc(m.hotels?.name||'Ξενοδοχείο')}</option>`).join('');
+ switcher.value=activeHotelId;switcher.hidden=hotelMemberships.length<2;
+ const activeMembership=hotelMemberships.find(m=>m.hotel_id===activeHotelId);
+ // Clear all tenant-specific content before loading another hotel's records.
+ clearTenantScopedState();
+ const activeHotelName=String(activeMembership?.hotels?.name||'').slice(0,100);
+ $('hotel-name').value=activeHotelName;
+ $('ai-hotel-name').value=activeHotelName;
+ const {data,error}=await supabaseClient.from('leads')
+  .select('id,hotel_id,name,email,phone,date,guests,value,status,notes')
+  .eq('hotel_id',activeHotelId).order('date',{ascending:true,nullsFirst:false});
+ if(error) throw error;
+ if(loadVersion!==cloudLoadVersion||!currentUser||currentUser.id!==requestedUserId)return;
+ leads=(data||[]).map(normalizeLead);
+ if(leads.length===0){
+  try{
+   const legacy=JSON.parse(localStorage.getItem(KEY)||'[]');
+   if(Array.isArray(legacy)&&legacy.length&&confirm('Βρέθηκαν '+legacy.length+' παλιά τοπικά αιτήματα. Θέλεις να τα αντιγράψεις στην online βάση του λογαριασμού σου;')){
+    leads=legacy.filter(x=>x&&typeof x.name==='string'&&typeof x.email==='string').map(normalizeLead);
+    if(leads.length) await save();
+   }
+  }catch(migrationError){console.warn('Local migration skipped:',migrationError)}
+ }
+ showStorageWarning(false);render();
+}
+async function save(ids=null){
+ if(!currentUser){showStorageWarning(true);alert('Συνδέσου πρώτα για να αποθηκεύσεις αιτήματα.');return false;}
+ try{
+  if(!activeHotelId) throw new Error('Δεν έχει επιλεγεί ξενοδοχείο.');
+  // Save only the rows currently being added/edited. Never infer deletions from
+  // a stale browser snapshot: another hotel staff member may have added a lead.
+  const selectedIds=ids===null?null:new Set(ids);
+  const rows=leads.filter(l=>selectedIds===null||selectedIds.has(l.id))
+   .map(l=>({id:l.id,hotel_id:activeHotelId,name:l.name,email:l.email,phone:l.phone||'',date:l.date||null,guests:l.guests,value:l.value,status:l.status,notes:l.notes||''}));
+  if(rows.length){const {error}=await supabaseClient.from('leads').upsert(rows,{onConflict:'id'});if(error)throw error;}
+  showStorageWarning(false);render();return true;
+ }catch(err){
+  console.error('Supabase save failed:',err);showStorageWarning(true);
+  // Reload authoritative server state so failed edits do not remain on screen.
+  try{await loadCloud()}catch(reloadError){console.error('Reload after save failure:',reloadError)}
+  alert('Δεν αποθηκεύτηκε στη βάση. Έλεγξε τη σύνδεση και τις πολιτικές RLS. Λεπτομέρειες: '+(err.message||'Άγνωστο σφάλμα'));
+  return false;
+ }
+}
+async function deleteLeadFromCloud(id){
+ if(!currentUser||!activeHotelId) throw new Error('Δεν υπάρχει ενεργό ξενοδοχείο ή σύνδεση.');
+ const {error}=await supabaseClient.from('leads').delete().eq('id',id).eq('hotel_id',activeHotelId);
+ if(error) throw error;
+}
+async function refreshAuth(){
+ const {data,error}=await supabaseClient.auth.getSession();
+ if(error)console.error(error);
+ currentUser=data?.session?.user||null;
+ $('auth-gate').style.display=currentUser?'none':'grid';
+ $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
+ $('sign-out').hidden=!currentUser;
+ if(currentUser){try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Πρόβλημα φόρτωσης ξενοδοχείου ή αιτημάτων: '+(err.message||''));}}
+ else{activeHotelId=null;hotelMemberships=[];$('hotel-switcher').hidden=true;clearTenantScopedState();showStorageWarning(false);}
+}
+$('auth-form').addEventListener('submit',async e=>{
+ e.preventDefault();$('auth-message').textContent='Γίνεται σύνδεση…';
+ const email=$('auth-email').value.trim(),password=$('auth-password').value;
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+ if(error){$('auth-message').textContent='Αποτυχία σύνδεσης: '+error.message;return;}
+ currentUser=data.user;await refreshAuth();$('auth-message').textContent='';
+});
+$('auth-signup').addEventListener('click',async()=>{
+ const email=$('auth-email').value.trim(),password=$('auth-password').value;
+ if(!email||password.length<8){$('auth-message').textContent='Συμπλήρωσε email και κωδικό τουλάχιστον 8 χαρακτήρων.';return;}
+ $('auth-message').textContent='Δημιουργία λογαριασμού…';
+ const {data,error}=await supabaseClient.auth.signUp({email,password});
+ if(error){$('auth-message').textContent='Σφάλμα: '+error.message;return;}
+ if(data.session){currentUser=data.user;await refreshAuth();$('auth-message').textContent='';}
+ else $('auth-message').textContent='Ο λογαριασμός δημιουργήθηκε. Έλεγξε το email σου για επιβεβαίωση και μετά συνδέσου.';
+});
+$('hotel-switcher').addEventListener('change',async e=>{activeHotelId=e.target.value;try{await loadCloud()}catch(err){console.error(err);showStorageWarning(true);alert('Δεν φορτώθηκαν τα αιτήματα: '+(err.message||''));}});
+$('sign-out').addEventListener('click',async()=>{cloudLoadVersion++;await supabaseClient.auth.signOut();currentUser=null;activeHotelId=null;hotelMemberships=[];leads=[];render();$('hotel-switcher').hidden=true;$('auth-gate').style.display='grid';$('cloud-user').textContent='CLOUD WORKSPACE';});
+supabaseClient.auth.onAuthStateChange((_event,session)=>{
+ cloudLoadVersion++;
+ currentUser=session?.user||null;
+ $('auth-gate').style.display=currentUser?'none':'grid';
+ $('cloud-user').textContent=currentUser?(currentUser.email||'CLOUD WORKSPACE'):'CLOUD WORKSPACE';
+ $('sign-out').hidden=!currentUser;
+ if(currentUser) setTimeout(()=>loadCloud().catch(err=>{console.error(err);showStorageWarning(true);alert('Πρόβλημα φόρτωσης: '+(err.message||''))}),0);
+ else{activeHotelId=null;hotelMemberships=[];$('hotel-switcher').hidden=true;clearTenantScopedState();showStorageWarning(false);}
+});
+function demoData(){return [
+{id:uid(),name:'Maria Papadopoulou',email:'maria.demo@example.com',phone:'+30 210 000 0000',date:'2026-11-12',guests:2,value:420,status:'open',notes:'Ζήτησε δίκλινο για 3 διανυκτερεύσεις.'},
+{id:uid(),name:'James Wilson',email:'james.demo@example.com',phone:'',date:'2026-12-04',guests:2,value:680,status:'open',notes:'Ρώτησε για διαμονή και πρωινό.'},
+{id:uid(),name:'Eleni Nikolaou',email:'eleni.demo@example.com',phone:'',date:'2026-10-28',guests:3,value:350,status:'confirmed',notes:'Demo επιβεβαιωμένη κράτηση.'},
+{id:uid(),name:'Alex Morgan',email:'alex.demo@example.com',phone:'',date:'2026-11-20',guests:1,value:210,status:'lost',notes:'Demo αίτημα που δεν προχώρησε.'}
+]}
+function leadCard(l){
+return `<article class="lead"><div class="lead-top"><div><div class="lead-name">${esc(l.name)}</div><div class="lead-email">${esc(l.email)}${l.phone?' · '+esc(l.phone):''}</div></div><div class="money">${money(l.value)}</div></div>
+<div class="lead-meta"><span class="tag ${esc(l.status)}">${statusLabel(l.status)}</span><span class="tag">${l.date?esc(l.date):'Ημ/νία μη ορισμένη'}</span><span class="tag">${Number(l.guests)||1} άτομα</span></div>
+${l.notes?`<p class="desc">${esc(l.notes)}</p>`:''}
+<div class="lead-actions"><button class="btn" data-email="${esc(l.id)}">Email draft</button><button class="btn edit-action" type="button" data-edit="${esc(l.id)}" aria-label="Επεξεργασία αιτήματος ${esc(l.name)}">✎ Επεξεργασία</button><button class="btn" data-status="${esc(l.id)}">Αλλαγή status</button><button class="btn danger" data-delete="${esc(l.id)}">Διαγραφή</button></div></article>`
+}
+function render(){
+const openLeads=leads.filter(l=>l.status==='open');
+const confirmedLeads=leads.filter(l=>l.status==='confirmed');
+const lostLeads=leads.filter(l=>l.status==='lost');
+const sumValue=items=>items.reduce((sum,l)=>sum+(Number(l.value)||0),0);
+const conversionRate=leads.length?(confirmedLeads.length/leads.length)*100:0;
+$('stat-total').textContent=leads.length;
+$('stat-open').textContent=openLeads.length;
+$('stat-confirmed').textContent=confirmedLeads.length;
+$('stat-value').textContent=money(sumValue(leads));
+$('stat-open-value').textContent=money(sumValue(openLeads));
+$('stat-confirmed-value').textContent=money(sumValue(confirmedLeads));
+$('stat-conversion').textContent=conversionRate.toLocaleString('el-GR',{maximumFractionDigits:1})+'%';
+$('stat-lost').textContent=lostLeads.length;
+$('rescue-count').textContent=openLeads.length+' ανοιχτά';
+$('recent-list').innerHTML=leads.slice().sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31')).slice(0,3).map(leadCard).join('')||'<div class="empty">Δεν υπάρχουν αιτήματα. Πρόσθεσε ένα ή φόρτωσε demo data.</div>';
+const q=$('search').value.toLowerCase(), f=$('filter').value;
+const filtered=leads.filter(l=>(f==='all'||l.status===f)&&[l.name,l.email,l.phone,l.notes].join(' ').toLowerCase().includes(q)).sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31'));
+$('all-list').innerHTML=filtered.map(leadCard).join('')||'<div class="empty">Δεν βρέθηκαν αιτήματα.</div>';
+const current=$('email-lead').value;
+$('email-lead').innerHTML=leads.map(l=>`<option value="${esc(l.id)}">${esc(l.name)} — ${esc(l.email)}</option>`).join('');
+if(leads.some(l=>l.id===current))$('email-lead').value=current;
+const aiCurrent=$('ai-lead').value;
+$('ai-lead').innerHTML=leads.map(l=>`<option value="${esc(l.id)}">${esc(l.name)} — ${esc(l.email)}</option>`).join('');
+if(leads.some(l=>l.id===aiCurrent))$('ai-lead').value=aiCurrent;else if(leads.length)$('ai-lead').value=leads[0].id;
+}
+function showPage(name){
+const titles={dashboard:['Επισκόπηση εσόδων','Μια καθαρή εικόνα των αιτημάτων κρατήσεων.'],receptionist:['AI Receptionist','Ψηφιακή υποδοχή επισκεπτών με ασφαλή ανθρώπινη κλιμάκωση.'],leads:['Αιτήματα κρατήσεων','Οργάνωσε τα αιτήματα και τις επόμενες ενέργειες.'],email:['Βοηθός email','Δημιούργησε ένα προσχέδιο και έλεγξέ το πριν σταλεί.'],ai:['AI Revenue Desk','Ανάλυση αιτημάτων και ευκαιριών εσόδων με τεχνητή νοημοσύνη.'],reports:['Αναφορές & δεδομένα','Εξαγωγή, δοκιμαστικά δεδομένα και πληροφορίες demo.']};
+if(!titles[name]) return;
+document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='page-'+name));
+document.querySelectorAll('.nav').forEach(n=>{
+const active=n.dataset.page===name;
+n.classList.toggle('active',active);
+if(active)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current');
+});
+$('page-title').textContent=titles[name][0];$('page-subtitle').textContent=titles[name][1];
+}
+function openModal(){
+editingLeadId = null;
+$('lead-form').reset();
+$('modal-title').textContent='Νέο booking lead';
+$('modal-subtitle').textContent='Συμπλήρωσε όσα στοιχεία γνωρίζεις.';
+$('save-lead-button').textContent='Αποθήκευση αιτήματος';
+$('modal-back').classList.add('show');$('f-name').focus()
+}
+function openEditModal(id){
+const l=leads.find(x=>x.id===id);if(!l)return;
+editingLeadId=id;
+$('modal-title').textContent='Επεξεργασία αιτήματος';
+$('modal-subtitle').textContent='Οι αλλαγές θα ενημερώσουν την υπάρχουσα καταχώριση χωρίς να δημιουργηθεί νέο αίτημα.';
+$('save-lead-button').textContent='Αποθήκευση αλλαγών';
+$('f-name').value=l.name;$('f-email').value=l.email;$('f-phone').value=l.phone||'';$('f-date').value=l.date;
+$('f-guests').value=l.guests;$('f-value').value=l.value;$('f-status').value=l.status;$('f-notes').value=l.notes;
+$('modal-back').classList.add('show');$('f-name').focus()
+}
+function closeModal(){ $('modal-back').classList.remove('show');$('lead-form').reset();editingLeadId=null;$('modal-title').textContent='Νέο booking lead';$('modal-subtitle').textContent='Συμπλήρωσε όσα στοιχεία γνωρίζεις.';$('save-lead-button').textContent='Αποθήκευση αιτήματος'}
+
+function setEmailLead(id){showPage('email');$('email-lead').value=id;generateEmail()}
+function generateEmail(){
+const l=leads.find(x=>x.id===$('email-lead').value);
+if(!l){$('email-subject').value='';$('email-body').textContent='Πρόσθεσε ή επίλεξε ένα αίτημα πρώτα.';return}
+const en=$('email-language').value==='en', hotel=$('hotel-name').value.trim()|| (en?'our hotel':'το ξενοδοχείο μας');
+const extra=$('verified-info').value.trim();
+$('email-subject').value=en?'Your accommodation enquiry':'Το αίτημά σας για διαμονή';
+const date=l.date|| (en?'your preferred dates':'τις ημερομηνίες που επιθυμείτε');
+let body;
+if(en){
+body=`Dear ${l.name},\n\nThank you for contacting ${hotel} about your stay for ${l.guests||2} guest(s), around ${date}.\n\nWe would be happy to assist with your enquiry. We will need to verify availability and the applicable rate before confirming any booking.${extra?'\n\nAdditional information:\n'+extra:''}\n\nPlease let us know if you have any other preferences.\n\nKind regards,\n${hotel}${$('hotel-contact').value.trim()?'\n'+$('hotel-contact').value.trim():''}`;
+}else{
+body=`Αγαπητέ/ή ${l.name},\n\nΣας ευχαριστούμε που επικοινωνήσατε με ${hotel} σχετικά με τη διαμονή ${l.guests||2} ατόμου/ων για ${date}.\n\nΘα χαρούμε να σας εξυπηρετήσουμε. Πριν επιβεβαιώσουμε οποιαδήποτε κράτηση, χρειάζεται να ελέγξουμε τη διαθεσιμότητα και την ισχύουσα τιμή.${extra?'\n\nΠρόσθετες πληροφορίες:\n'+extra:''}\n\nΠαραμένουμε στη διάθεσή σας για οποιαδήποτε διευκρίνιση.\n\nΜε εκτίμηση,\n${hotel}${$('hotel-contact').value.trim()?'\n'+$('hotel-contact').value.trim():''}`;
+}
+$('email-body').textContent=body;
+}
+let lastAIResult = null;
+function setAIStatus(message,show=true){const el=$('ai-status');el.textContent=message;el.hidden=!show;}
+function formatAIResult(value){
+ if(typeof value==='string') return value;
+ try{return JSON.stringify(value,null,2)}catch(_){return String(value??'Δεν επιστράφηκε αποτέλεσμα.')}
+}
+async function runAI(action){
+ if(!currentUser||!activeHotelId){setAIStatus('Χρειάζεται ενεργή σύνδεση και επιλεγμένο ξενοδοχείο.');return;}
+ const requestVersion=++aiRequestVersion;
+ const requestHotelId=activeHotelId;
+ const requestUserId=currentUser.id;
+ const selected=leads.find(l=>l.id===$('ai-lead').value)||null;
+ if(action!=='revenue_intelligence'&&!selected){setAIStatus('Πρόσθεσε ή επίλεξε ένα αίτημα κρατήσεων πρώτα.');return;}
+ const buttons=[...document.querySelectorAll('[data-ai-action]')];
+ buttons.forEach(b=>b.disabled=true);
+ setAIStatus('Το AI επεξεργάζεται τα δεδομένα…');$('ai-result').textContent='Παρακαλώ περίμενε.';$('ai-use-email').disabled=true;lastAIResult=null;
+ const openLeads=leads.filter(l=>l.status==='open');
+ const confirmedLeads=leads.filter(l=>l.status==='confirmed');
+ const lostLeads=leads.filter(l=>l.status==='lost');
+ const sumValue=items=>items.reduce((sum,l)=>sum+(Number(l.value)||0),0);
+ const metrics={
+  total_requests:leads.length,
+  open_requests:openLeads.length,
+  confirmed_requests:confirmedLeads.length,
+  lost_requests:lostLeads.length,
+  open_request_rate_pct:leads.length?Number((openLeads.length/leads.length*100).toFixed(1)):0,
+  confirmed_conversion_rate_pct:leads.length?Number((confirmedLeads.length/leads.length*100).toFixed(1)):0,
+  lost_request_rate_pct:leads.length?Number((lostLeads.length/leads.length*100).toFixed(1)):0,
+  open_potential_value:sumValue(openLeads),
+  confirmed_value:sumValue(confirmedLeads),
+  lost_value:sumValue(lostLeads),
+  total_recorded_value:sumValue(leads),
+  metric_definitions:{confirmed_conversion_rate_pct:'confirmed_requests / total_requests * 100; this is a historical request conversion ratio, not a probability that an open request will book',open_request_rate_pct:'open_requests / total_requests * 100'}
+ };
+ const lead=selected?{name:selected.name,date:selected.date,guests:selected.guests,value:selected.value,status:selected.status,notes:selected.notes}:null;
+ const hotel={name:$('ai-hotel-name').value.trim()||$('hotel-name').value.trim()||'Το ξενοδοχείο',verified_info:$('ai-verified-info').value.trim()||$('verified-info').value.trim()};
+ try{
+  const {data,error}=await supabaseClient.functions.invoke('client-rescue-ai',{body:{action,hotel_id:requestHotelId,lead,hotel,metrics}});
+  if(requestVersion!==aiRequestVersion||activeHotelId!==requestHotelId||!currentUser||currentUser.id!==requestUserId)return;
+  if(error){let detail=error.message||'Άγνωστο σφάλμα';try{if(error.context&&typeof error.context.json==='function'){const body=await error.context.json();detail=body.error||body.message||detail;}}catch(_){}throw new Error(detail);}
+  if(!data||data.success!==true) throw new Error(data?.error||'Το AI Engine δεν επέστρεψε επιτυχημένο αποτέλεσμα.');
+  lastAIResult={action,result:data.result};
+  $('ai-result').textContent=formatAIResult(data.result);
+  $('ai-use-email').disabled=action!=='draft_email';
+  setAIStatus('Η λειτουργία ολοκληρώθηκε. Μοντέλο: '+(data.model||'GroqCloud')+'. Έλεγξε το αποτέλεσμα πριν το χρησιμοποιήσεις.');
+ }catch(err){console.error('Client Rescue AI error:',err);if(requestVersion===aiRequestVersion&&activeHotelId===requestHotelId&&currentUser?.id===requestUserId){$('ai-result').textContent='Δεν ήταν δυνατή η ολοκλήρωση της λειτουργίας. Δοκίμασε ξανά αργότερα ή επικοινώνησε με τον διαχειριστή.';setAIStatus('Το AI Engine δεν ολοκλήρωσε το αίτημα. Έλεγξε τη σύνδεση, το deployment και τα δικαιώματα του ξενοδοχείου.');}}
+ finally{if(requestVersion===aiRequestVersion)buttons.forEach(b=>b.disabled=false);}
+}
+document.querySelectorAll('[data-ai-action]').forEach(button=>button.addEventListener('click',()=>runAI(button.dataset.aiAction)));
+
+// AI Receptionist: bounded in-memory chat; no guest messages are persisted.
+let receptionistHistory=[];
+let receptionistRequestTimes=[];
+function resetReceptionistChat(){receptionistRequestVersion++;receptionistHistory=[];const send=$('receptionist-send');const inputControl=$('receptionist-input');if(send)send.disabled=false;if(inputControl)inputControl.disabled=false;const log=$('receptionist-log');if(log){log.innerHTML='';addReceptionistBubble('assistant','Καλησπέρα σας! Είμαι ο ψηφιακός βοηθός του ξενοδοχείου. Πώς μπορώ να σας βοηθήσω;');}const input=$('receptionist-input');if(input)input.value='';const usage=$('receptionist-usage');if(usage){const now=Date.now();receptionistRequestTimes=receptionistRequestTimes.filter(t=>now-t<60000);usage.textContent='Τοπικό όριο χρήσης: έως 5 μηνύματα ανά λεπτό ανά ανοιχτή καρτέλα. Δεν αντικαθιστά server-side προστασία. ('+receptionistRequestTimes.length+'/5)';}}
+function addReceptionistBubble(role, text, flag=''){
+ const bubble=document.createElement('div');bubble.className='chat-bubble '+(role==='assistant'?'assistant':'guest');bubble.textContent=text;
+ $('receptionist-log').appendChild(bubble);
+ if(flag){const note=document.createElement('div');note.className='chat-handoff';note.textContent=flag;$('receptionist-log').appendChild(note);}
+ $('receptionist-log').scrollTop=$('receptionist-log').scrollHeight;
+}
+function addReceptionistSuggestion(text){
+ if(!text||typeof text!=='string'||!text.trim())return;
+ const wrap=document.createElement('div');wrap.className='chat-handoff';
+ const label=document.createElement('span');label.textContent='Προτεινόμενη συνέχεια: ';
+ const button=document.createElement('button');button.type='button';button.className='btn';button.textContent=text.slice(0,180);
+ button.addEventListener('click',()=>{$('receptionist-input').value=text.slice(0,1200);$('receptionist-input').focus();});
+ wrap.append(label,button);$('receptionist-log').appendChild(wrap);
+ $('receptionist-log').scrollTop=$('receptionist-log').scrollHeight;
+}
+$('receptionist-form').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const input=$('receptionist-input');const message=input.value.trim();
+ if(!message)return;
+ if(!currentUser||!activeHotelId){addReceptionistBubble('assistant','Χρειάζεται σύνδεση και ενεργό ξενοδοχείο για να λειτουργήσει ο receptionist.');return;}
+ if(receptionistHistory.length>=12){addReceptionistBubble('assistant','Η συνομιλία έφτασε το όριο μηνυμάτων. Ξεκίνησε νέα συνομιλία για να συνεχίσουμε.');return;}
+ const requestVersion=++receptionistRequestVersion;
+ const requestHotelId=activeHotelId;
+ const requestUserId=currentUser.id;
+ const now=Date.now();receptionistRequestTimes=receptionistRequestTimes.filter(t=>now-t<60000);
+ if(receptionistRequestTimes.length>=5){$('receptionist-usage').textContent='Έφτασες το όριο των 5 μηνυμάτων ανά λεπτό σε αυτή την καρτέλα. Περίμενε να περάσει ένα λεπτό.';return;}
+ receptionistRequestTimes.push(now);$('receptionist-usage').textContent='Αποστολές τελευταίου λεπτού σε αυτή την καρτέλα: '+receptionistRequestTimes.length+'/5.';
+ const send=$('receptionist-send');send.disabled=true;input.disabled=true;
+ receptionistHistory.push({role:'user',content:message});addReceptionistBubble('user',message);input.value='';
+ const facts=$('receptionist-facts').value.trim()||$('ai-verified-info').value.trim()||$('verified-info').value.trim();
+ try{
+  const {data,error}=await supabaseClient.functions.invoke('client-rescue-ai',{body:{action:'receptionist_chat',hotel_id:requestHotelId,hotel:{name:$('ai-hotel-name').value.trim()||$('hotel-name').value.trim()||'Το ξενοδοχείο',verified_info:facts},messages:receptionistHistory}});
+  if(requestVersion!==receptionistRequestVersion||activeHotelId!==requestHotelId||!currentUser||currentUser.id!==requestUserId)return;
+  if(error){let detail=error.message||'AI connection error';try{if(error.context&&typeof error.context.json==='function'){const body=await error.context.json();detail=body.error||body.message||detail;}}catch(_){}throw new Error(detail);}
+  if(!data||data.success!==true||!data.result||typeof data.result.reply!=='string')throw new Error(data?.error||'Invalid receptionist response');
+  const reply=data.result.reply;receptionistHistory.push({role:'assistant',content:reply});addReceptionistBubble('assistant',reply,data.result.escalation_needed?'Χρειάζεται επιβεβαίωση από την ομάδα του ξενοδοχείου.':'');addReceptionistSuggestion(data.result.suggested_follow_up);
+ }catch(err){console.error('Receptionist error:',err);if(requestVersion===receptionistRequestVersion&&activeHotelId===requestHotelId&&currentUser?.id===requestUserId){receptionistHistory.pop();addReceptionistBubble('assistant','Δεν μπορώ να απαντήσω αυτή τη στιγμή. Παρακαλώ επικοινωνήστε με την ομάδα του ξενοδοχείου.');}}
+ finally{if(requestVersion===receptionistRequestVersion){send.disabled=false;input.disabled=false;input.focus();}}
+});
+$('receptionist-clear').addEventListener('click',resetReceptionistChat);
+
+$('ai-copy-result').addEventListener('click',async()=>{const value=$('ai-result').textContent;if(!value.trim())return;try{await navigator.clipboard.writeText(value);setAIStatus('Το αποτέλεσμα αντιγράφηκε.')}catch(_){prompt('Αντέγραψε το αποτέλεσμα:',value)}});
+$('ai-use-email').addEventListener('click',()=>{
+ if(!lastAIResult||lastAIResult.action!=='draft_email')return;
+ const result=lastAIResult.result;
+ let subject='',body='';
+ if(result&&typeof result==='object'){subject=String(result.subject||result.email_subject||'');body=String(result.body||result.email_body||result.draft||result.text||'');}
+ else{body=String(result??'');}
+ if(!body){$('email-body').textContent=formatAIResult(result);body=$('email-body').textContent;}
+ if(subject)$('email-subject').value=subject;
+ $('email-body').textContent=body;
+ const selected=leads.find(l=>l.id===$('ai-lead').value);if(selected)$('email-lead').value=selected.id;
+ showPage('email');setAIStatus('Το AI προσχέδιο μεταφέρθηκε στον Βοηθό email. Έλεγξε το κείμενο και τα στοιχεία πριν ανοίξεις το email app.',false);
+});
+$('ai-verified-info').addEventListener('input',()=>{if($('verified-info'))$('verified-info').value=$('ai-verified-info').value;});
+$('ai-lead').addEventListener('change',()=>{const selected=leads.find(l=>l.id===$('ai-lead').value);if(selected)$('email-lead').value=selected.id;});
+
+function download(name,text,type){
+const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>showPage(n.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.goto)));
+$('new-lead').onclick=openModal;$('new-lead-top').onclick=openModal;
+$('cancel-modal').onclick=closeModal;
+$('modal-back').addEventListener('click',e=>{if(e.target===$('modal-back'))closeModal()});
+$('lead-form').addEventListener('submit',async e=>{
+e.preventDefault();
+const guestCount=Number($('f-guests').value);
+const quotedValue=Number($('f-value').value);
+const email=$('f-email').value.trim();
+if(!email||!$('f-email').checkValidity()){alert('Συμπλήρωσε μια έγκυρη διεύθυνση email.');$('f-email').focus();return;}
+if(!Number.isInteger(guestCount)||guestCount<1||guestCount>30){alert('Ο αριθμός ατόμων πρέπει να είναι ακέραιος από 1 έως 30.');$('f-guests').focus();return;}
+if(!Number.isFinite(quotedValue)||quotedValue<0||quotedValue>10000000){alert('Η εκτιμώμενη αξία πρέπει να είναι από 0 έως 10.000.000 €.');$('f-value').focus();return;}
+const data={name:$('f-name').value.trim(),email,phone:$('f-phone').value.trim().slice(0,40),
+date:$('f-date').value,guests:guestCount,value:quotedValue,
+status:['open','confirmed','lost'].includes($('f-status').value)?$('f-status').value:'open',notes:$('f-notes').value.trim().slice(0,1000)};
+if(!data.name){alert('Συμπλήρωσε το όνομα του πελάτη.');$('f-name').focus();return;}
+let changedId;
+if(editingLeadId){
+const index=leads.findIndex(l=>l.id===editingLeadId);
+if(index===-1){alert('Το αίτημα δεν βρέθηκε. Άνοιξε ξανά τη λίστα και δοκίμασε πάλι.');closeModal();return}
+changedId=editingLeadId;
+leads[index]={...leads[index],...data};
+}else{
+const newLead={id:uid(),...data};
+changedId=newLead.id;
+leads.push(newLead);
+}
+const ok=await save([changedId]);if(ok){closeModal();showPage('leads');}
+});
+$('search').addEventListener('input',render);$('filter').addEventListener('change',render);
+document.addEventListener('click',async e=>{
+const email=e.target.closest('[data-email]');if(email){setEmailLead(email.dataset.email);return}
+const edit=e.target.closest('[data-edit]');if(edit){openEditModal(edit.dataset.edit);return}
+const status=e.target.closest('[data-status]');if(status){
+const l=leads.find(x=>x.id===status.dataset.status);if(!l)return;
+const choices=['open','confirmed','lost'];l.status=choices[(choices.indexOf(l.status)+1)%choices.length];await save([l.id]);return}
+const del=e.target.closest('[data-delete]');if(del&&confirm('Να διαγραφεί αυτό το αίτημα;')){
+try{await deleteLeadFromCloud(del.dataset.delete);leads=leads.filter(l=>l.id!==del.dataset.delete);render();showStorageWarning(false)}
+catch(err){console.error('Lead deletion failed:',err);showStorageWarning(true);alert('Δεν ήταν δυνατή η διαγραφή. '+(err.message||''));try{await loadCloud()}catch(reloadError){console.error(reloadError)}}
+}
+});
+$('generate-email').onclick=generateEmail;
+$('email-language').onchange=generateEmail;
+$('email-lead').onchange=generateEmail;
+$('clear-email').onclick=()=>{$('email-subject').value='';$('email-body').textContent='Επίλεξε αίτημα και πάτησε «Δημιουργία προσχεδίου».'};
+$('copy-email').onclick=async()=>{
+const text='Subject: '+$('email-subject').value+'\n\n'+$('email-body').textContent;
+try{await navigator.clipboard.writeText(text);alert('Το κείμενο αντιγράφηκε.')}catch{prompt('Αντέγραψε το κείμενο:',text)}
+};
+$('open-mail').onclick=()=>{
+const l=leads.find(x=>x.id===$('email-lead').value);if(!l)return alert('Επίλεξε αίτημα πρώτα.');
+const subject=$('email-subject').value.trim();
+const body=$('email-body').textContent.trim();
+// Open the user's configured email app. The user must review and press Send;
+// this never sends mail in the background.
+const params=new URLSearchParams({subject,body});
+window.location.href='mailto:'+encodeURI(l.email||'')+'?'+params.toString();
+};
+$('load-demo').onclick=async()=>{if(!confirm('Να προστεθούν δοκιμαστικά αιτήματα;'))return;const additions=demoData();leads=leads.concat(additions);await save(additions.map(l=>l.id))};
+$('delete-all').onclick=async()=>{
+ if(!confirm('Να διαγραφούν όλα τα αιτήματα του ενεργού ξενοδοχείου; Η ενέργεια δεν αναιρείται.'))return;
+ if(!currentUser||!activeHotelId){alert('Δεν υπάρχει ενεργό ξενοδοχείο ή σύνδεση.');return;}
+ try{
+  const {error}=await supabaseClient.from('leads').delete().eq('hotel_id',activeHotelId);
+  if(error)throw error;
+  leads=[];render();showStorageWarning(false);
+ }catch(err){console.error('Bulk deletion failed:',err);showStorageWarning(true);alert('Δεν ήταν δυνατή η διαγραφή όλων των αιτημάτων. '+(err.message||''));try{await loadCloud()}catch(reloadError){console.error(reloadError)}}
+};
+$('export-json').onclick=()=>download('client-rescue-leads.json',JSON.stringify(leads,null,2),'application/json');
+$('export-csv').onclick=()=>{
+const cols=['name','email','phone','date','guests','value','status','notes'];
+// Prevent spreadsheet formula execution when exported text begins with formula markers.
+const quote=v=>{let value=String(v??'');if(/^[\s\u0000-\u001f]*[=+@-]/.test(value))value="'"+value;return '"'+value.replace(/"/g,'""')+'"'};
+const csv=[cols.join(','),...leads.map(l=>cols.map(c=>quote(l[c])).join(','))].join('\r\n');
+download('client-rescue-leads.csv','\ufeff'+csv,'text/csv;charset=utf-8');
+};
+
+/* Βοήθεια, μεγαλύτερα γράμματα και εύκολη πλοήγηση */
+(function setupAccessibilityAndHelp() {
+  const sizeButton = $('readability-toggle');
+  const helpButton = $('help-toggle');
+  const helpPanel = $('quick-help');
+  const helpClose = $('help-close');
+
+  try {
+    if (localStorage.getItem('client_rescue_large_text') === 'true') {
+      document.body.classList.add('large-text');
+      if (sizeButton) { sizeButton.setAttribute('aria-pressed','true'); sizeButton.textContent = 'ΑΑ Κανονικά γράμματα'; }
+    }
+  } catch (_) {}
+
+  if (sizeButton) sizeButton.addEventListener('click', () => {
+    const enabled = document.body.classList.toggle('large-text');
+    sizeButton.setAttribute('aria-pressed', String(enabled));
+    sizeButton.textContent = enabled ? 'ΑΑ Κανονικά γράμματα' : 'ΑΑ Μεγαλύτερα γράμματα';
+    try { localStorage.setItem('client_rescue_large_text', String(enabled)); } catch (_) {}
+  });
+
+  const closeHelp = () => {
+    if (!helpButton || !helpPanel) return;
+    helpPanel.hidden = true;
+    helpButton.setAttribute('aria-expanded','false');
+    helpButton.focus();
+  };
+  if (helpButton) helpButton.addEventListener('click', () => {
+    if (!helpPanel) return;
+    helpPanel.hidden = !helpPanel.hidden;
+    helpButton.setAttribute('aria-expanded', String(!helpPanel.hidden));
+    if (!helpPanel.hidden) helpPanel.focus();
+  });
+  if (helpClose) helpClose.addEventListener('click', closeHelp);
+
+  const welcomeNew = $('welcome-new-lead');
+  const welcomeLeads = $('welcome-open-leads');
+  if (welcomeNew) welcomeNew.addEventListener('click', openModal);
+  if (welcomeLeads) welcomeLeads.addEventListener('click', () => {
+    showPage('leads');
+    $('search').focus();
+  });
+
+  document.querySelectorAll('.nav').forEach(n => {
+    n.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showPage(n.dataset.page);
+        document.querySelectorAll('.nav').forEach(item => item.removeAttribute('aria-current'));
+        n.setAttribute('aria-current','page');
+      }
+    });
+    n.addEventListener('click', () => {
+      document.querySelectorAll('.nav').forEach(item => item.removeAttribute('aria-current'));
+      n.setAttribute('aria-current','page');
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && helpPanel && !helpPanel.hidden) closeHelp();
+  });
+})();
+
+render();
+refreshAuth();
+</script>
+</body>
+</html>
